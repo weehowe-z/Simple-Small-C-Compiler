@@ -1,22 +1,34 @@
+%code requires
+{
+    #define YYSTYPE double
+    /*Override Bison’s default YYSTYPE */
+}
+
 %{
+/*#define YYSTYPE double  /*Deafult Type is INT*/
 #include <stdio.h>
+#include <math.h>
+#define Pi 3.1415926
 %}
 
-%token INTEGER
+%token INTEGER RATIONAL
 %left '+' '-'
 %left '*' '/'
 %nonassoc UMINUS
+%left '^'
 
 %%
-statement:
-		number		{ printf("The answer is %d\n", $1); }
+stmt:
+		expr { printf("= %.2f\n", $1); }
 	;
 
-number:	
-		number '+' number	{ $$ = $1 + $3; }
-	|	number '-' number	{ $$ = $1 - $3; }
-	|	number '*' number	{ $$ = $1 * $3; }
-	|	number '/' number	{ 
+expr:	
+		INTEGER
+	|	RATIONAL
+	|	expr '+' expr	{ $$ = $1 + $3; }
+	|	expr '-' expr	{ $$ = $1 - $3; }
+	|	expr '*' expr	{ $$ = $1 * $3; }
+	|	expr '/' expr	{ 
 		if ($3 == 0){
 			yyerror ("Error, divide by zero!");
 			return -1;
@@ -24,7 +36,8 @@ number:
 		else
 			$$ = $1 / $3;
 		}
-	|	INTEGER				{ $$ = $1; }
+	|	expr '^' expr	{ $$ = pow($1,$3);}
+	|	'('	expr ')'		{ $$ = $2; }
 	|   '-' INTEGER  %prec UMINUS { $$ = -$2; }
 	;
 %%
