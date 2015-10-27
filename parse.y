@@ -7,21 +7,41 @@
 %{
 #include <stdio.h>
 extern FILE *yyin;
+/*Solve warning: implicit declaration*/
+int yyerror (char *msg);
+int yylex();
 %}
 
 %token
-INTEGER RATIONAL SEMI COMMA DOT
+ID INTEGER RATIONAL SEMI COMMA DOT
+BINARYOP UNARYOP ASSIGNOP
+TYPE LP RP LB RB LC RC STRUCT
+RETURN IF THEN ELSE BREAK CONT FOR 
 
 %%
-stmt:
-		expr { printf("%g\n", $1);}
+PROGRAM:
+		EXTDEFS
 	;
 
-expr:	
-		INTEGER			{ printf("BISON Find integer: %g\n", $1);}
-	|	RATIONAL		{ printf("BISON Find rational: %g\n", $1);}
-	|	INTEGER	expr	{ printf("BISONex Find integer: %g\n", $1);}
-	|	RATIONAL expr	{ printf("BISONex Find rational: %g\n", $1);}
+EXTDEFS:
+		EXTDEF EXTDEFS
+	|	/*EMPTY*/
+	;
+
+EXTDEF:
+		SPEC EXTVARS SEMI			{printf("BISON find new var defination\n");}
+	;
+
+EXTVARS:
+		VAR
+	;
+
+SPEC:
+		TYPE
+	;
+
+VAR:
+		ID
 	;
 
 %%
@@ -31,7 +51,7 @@ int main (int argc, char const *argv[]) {
 
 	if (argc == 1){
 		printf("%s\n", "YACC: please write your code in the shell. input CTRL-D to exit.");
-		printf("%s\n", "YACC: or you can specify the source code path. example --> $./a.out  test.in\n");
+		printf("%s\n", "YACC: or you can specify the source code path. \nexample --> $./a.out  sourceFile outputFile\n");
 		return yyparse();
 	}
 	else {

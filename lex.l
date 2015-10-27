@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include "y.tab.h"
+
 %}
 
 /*Regular Definations*/
@@ -13,24 +14,34 @@ RATIONAL	{DIGIT}+(\.{DIGIT}+)?(E[+-]?{DIGIT}+)?
 SEMI		[;]
 COMMA		[,]
 DOT			[.]
+UNDERSCORE	[_]
+ASSIGNOP	[=]
 LETTER		[A-Za-z]
-ID			{LETTER}({LETTER}|{DIGIT})*
+ID			({LETTER}|{UNDERSCORE})({LETTER}|{DIGIT}|{UNDERSCORE})*
 %%
  
 
 {DELIM}		{/*Need no actions*/}
 
-{INTEGER}	{
-				printf( "Flex Find integer: %s (%d)\n", yytext, atoi(yytext));
-				yylval = atoi(yytext);
-				return INTEGER;
-			}
+{SEMI}		{return SEMI;}
+{COMMA}		{return COMMA;}
+{DOT}		{return DOT;}
 
-{RATIONAL}	{
-				printf( "Flex Find rational: %s (%g)\n", yytext, atof(yytext));
-				yylval = atof(yytext);
-				return RATIONAL;
-            }
+{INTEGER}	{yylval = atoi(yytext);return INTEGER;}
+
+{ASSIGNOP}  {return ASSIGNOP;}
+
+if          {return IF;}
+then		{return THEN;}
+else		{return ELSE;}
+break		{return BREAK;}
+continue	{return CONT;}
+for         {return FOR;}
+struct      {return STRUCT;}
+int 		{return TYPE;}
+
+{ID}		{yylval = ID;return ID;}
+{RATIONAL}	{yylval = atof(yytext);return RATIONAL;}
 
 %%
 
