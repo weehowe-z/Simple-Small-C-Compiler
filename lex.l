@@ -16,6 +16,12 @@ COMMA		[,]
 DOT			[.]
 UNDERSCORE	[_]
 ASSIGNOP	[=]
+LP			[(]
+RP			[)]
+LB			[[]
+RB			[]]
+LC			[{]
+RC			[}]
 LETTER		[A-Za-z]
 ID			({LETTER}|{UNDERSCORE})({LETTER}|{DIGIT}|{UNDERSCORE})*
 %%
@@ -26,10 +32,9 @@ ID			({LETTER}|{UNDERSCORE})({LETTER}|{DIGIT}|{UNDERSCORE})*
 {SEMI}		{return SEMI;}
 {COMMA}		{return COMMA;}
 {DOT}		{return DOT;}
+{ASSIGNOP}  {return ASSIGNOP;}
 
 {INTEGER}	{yylval = atoi(yytext);return INTEGER;}
-
-{ASSIGNOP}  {return ASSIGNOP;}
 
 if          {return IF;}
 then		{return THEN;}
@@ -39,13 +44,17 @@ continue	{return CONT;}
 for         {return FOR;}
 struct      {return STRUCT;}
 int 		{return TYPE;}
+{LP}		{return LP;}
+{RP}		{return RP;}
+{LB}		{return LB;}
+{RB}		{return RB;}
+{LC}		{return LC;}
+{RC}		{return RC;}
 
 {ID}		{yylval = ID;return ID;}
 {RATIONAL}	{yylval = atof(yytext);return RATIONAL;}
 
 %%
-
-
 
 int yywrap() 
 { 
