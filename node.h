@@ -58,7 +58,10 @@ public:
 			}
 		}
 	}
-
+	void changeRoot(tokenNode* rt = NULL)
+	{
+		root = rt;
+	}
 	void print()
 	{
 		tokenNode *p;

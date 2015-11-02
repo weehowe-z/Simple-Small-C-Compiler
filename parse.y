@@ -1,10 +1,14 @@
 %{
 #include <stdio.h>
+#include <queue>
+#include <vector>
 #include "node.h"
 extern FILE *yyin;
 /*Solve warning: implicit declaration*/
 int yyerror (const char *msg);
 int yylex();
+parseTree pTree;
+vector<tokenNode*> vec;
 %}
 
 %union
@@ -17,7 +21,8 @@ int yylex();
 %token <charValue>ID
 %token <charValue>BINARYOP
 %token <charValue>UNARYOP
-%token SEMI COMMA DOT ASSIGNOP TYPE LP RP LB RB LC RC STRUCT RETURN IF THEN ELSE BREAK CONT FOR 
+%token <charValue>TYPE
+%token SEMI COMMA DOT ASSIGNOP LP RP LB RB LC RC STRUCT RETURN IF THEN ELSE BREAK CONT FOR 
 
 %nonassoc	BINARYOP 
 %right		UNARYOP
@@ -27,9 +32,16 @@ int yylex();
 
 %%
 PROGRAM:
-		EXTDEFS
-	|	INT           {printf("haha%d\n", $1);return 0;}
-	|	TEST
+		EXTDEFS				{
+								tokenNode* extdefs = vec.back();
+								vec.pop_back();
+								tokenNode* program = new tokenNode("program",extdefs,NULL);
+								pTree.changeRoot(program);
+								pTree.print();
+								return 0;
+							}
+	//|	INT           {printf("haha%d\n", $1);return 0;}
+	|	TEST        
 	;
 
 TEST:
@@ -39,29 +51,62 @@ TEST:
 								tokenNode* id2 = new tokenNode("id",idval2,NULL);
 								tokenNode* id1 = new tokenNode("id",idval1,id2);
 								tokenNode* test = new tokenNode("test",id1,NULL);
-								parseTree p(test);
-								p.print();
+								pTree.changeRoot(test);
+								pTree.print();
 							}
 	;
 
 EXTDEFS:
-		EXTDEF EXTDEFS
-	|	/*EMPTY*/
+		EXTDEF EXTDEFS		{
+								tokenNode* extdefs = vec.back();
+								vec.pop_back();
+								tokenNode* extdef = vec.back();
+								extdef->pnextSubling = extdefs;
+								vec.pop_back();
+								extdefs = new tokenNode("extdefs",extdef,NULL);
+								vec.push_back(extdefs);
+							}
+
+	|	/*EMPTY*/			{
+								tokenNode* empty = new tokenNode("epsilon");
+								vec.push_back(empty);
+							}	
 	;
 
 EXTDEF:
-		SPEC EXTVARS SEMI
+		SPEC EXTVARS SEMI   {
+								tokenNode* semi= new tokenNode(";");
+								tokenNode* extvars = vec.back();
+								vec.pop_back();
+								tokenNode* spec = vec.back();
+								vec.pop_back();
+								spec->pnextSubling = extvars;
+								extvars->pnextSubling = semi;
+								tokenNode* extdef = new tokenNode("extdef",spec,NULL);
+								vec.push_back(extdef);
+
+							}
 	|	SPEC FUNC STMTBLOCK
 	;
 
 EXTVARS:
-		DEC
+		DEC             	{
+								tokenNode* dec = vec.back();
+								vec.pop_back();
+								tokenNode* extvars = new tokenNode("extvars",dec,NULL);
+								vec.push_back(extvars);
+							}
+
 	|	DEC COMMA EXTVARS
 	|	/*EMPTY*/
 	;
 
 SPEC:
-		TYPE
+		TYPE            	{
+								tokenNode* type = new tokenNode($1);
+								tokenNode* spec = new tokenNode("spec",type,NULL);
+								vec.push_back(spec);
+							}
 	|	STSPEC
 	;
 
@@ -74,7 +119,12 @@ OPTTAG:
 	|	/*EMPTY*/
 
 VAR:
-		ID
+		ID              	{
+								tokenNode* idval= new tokenNode($1);
+								tokenNode* id = new tokenNode("id",idval,NULL);
+								tokenNode* var = new tokenNode("var",id,NULL);
+								vec.push_back(var);
+							}
 	|	VAR LB INT RB
 	;
 
@@ -125,7 +175,12 @@ DECS:
 	;
 
 DEC:
-		VAR
+		VAR					{
+								tokenNode* var = vec.back();
+								vec.pop_back();
+								tokenNode* dec = new tokenNode("dec",var,NULL);
+								vec.push_back(dec);
+							}		
 	|	VAR ASSIGNOP INIT
 	;
 

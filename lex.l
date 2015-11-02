@@ -30,8 +30,8 @@ BINARYOP	\*|\/|%|\+|-|<<|>>|>|>=|<|<=|==|!=|&|^|\||&&|\|\||\+=|-=|\*=|\/=|&=|\^=
 
 {DELIM}		{/*Need no actions*/}
 
-{UNARYOP}  	{yylval.charValue = strdup(yytext); return UNARYOP;}
-{BINARYOP}  {yylval.charValue = strdup(yytext); return BINARYOP;}
+{UNARYOP}  	{yylval.charValue = strdup(yytext);return UNARYOP;}
+{BINARYOP}  {yylval.charValue = strdup(yytext);return BINARYOP;}
 {ASSIGNOP}	{return ASSIGNOP;}
 
 {SEMI}		{return SEMI;}
@@ -44,7 +44,7 @@ break		{return BREAK;}
 continue	{return CONT;}
 for         {return FOR;}
 struct      {return STRUCT;}
-int 		{return TYPE;}
+int 		{yylval.charValue = strdup(yytext);return TYPE;}
 {LP}		{return LP;}
 {RP}		{return RP;}
 {LB}		{return LB;}
