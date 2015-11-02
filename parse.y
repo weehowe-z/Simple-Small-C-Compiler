@@ -39,6 +39,7 @@ PROGRAM:
 								tokenNode* program = new tokenNode("program",extdefs,NULL);
 								pTree.changeRoot(program);
 								pTree.fprint(yyout);
+								pTree.printWidth(yyout);
 								return 0;
 							}
 	//|	INT           {printf("haha%d\n", $1);return 0;}
@@ -53,7 +54,7 @@ TEST:
 								tokenNode* id1 = new tokenNode("id",idval1,id2);
 								tokenNode* test = new tokenNode("test",id1,NULL);
 								pTree.changeRoot(test);
-								pTree.print();
+								//pTree.fprint(yyout);
 							}
 	;
 
@@ -165,7 +166,7 @@ DEFS:
 		DEF DEFS
 	|	/*EMPTY*/
 	;
-
+     
 DEF:
 		SPEC DECS SEMI
 	;
@@ -225,7 +226,7 @@ int main (int argc, char const *argv[]) {
 
 	else if (argc == 2){
 		FILE *fin = fopen(argv[1],"r");
-		if (!fin) {
+		if (!fin) { 
 			return fprintf (stderr, "YACC: Input file %s does not exist!\n", argv[1]);
 		}
 		yyin = fin;
