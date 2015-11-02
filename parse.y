@@ -4,6 +4,7 @@
 #include <vector>
 #include "node.h"
 extern FILE *yyin;
+extern FILE *yyout;
 /*Solve warning: implicit declaration*/
 int yyerror (const char *msg);
 int yylex();
@@ -37,7 +38,7 @@ PROGRAM:
 								vec.pop_back();
 								tokenNode* program = new tokenNode("program",extdefs,NULL);
 								pTree.changeRoot(program);
-								pTree.print();
+								pTree.fprint(yyout);
 								return 0;
 							}
 	//|	INT           {printf("haha%d\n", $1);return 0;}
@@ -217,22 +218,46 @@ ARGS:
 int main (int argc, char const *argv[]) {
 
 	if (argc == 1){
-		printf("%s\n", "YACC: please write your code in the shell. input CTRL-D to exit.");
-		printf("%s\n", "YACC: or you can specify the source code path. \nexample --> $./a.out  sourceFile outputFile\n");
+		fprintf(stderr, "%s\n", "YACC: please write your code in the shell. input CTRL-D to exit.");
+		fprintf(stderr, "%s\n", "YACC: or you can specify the source code path. \nexample --> $./a.out  inputFile outputFile\n");
 		return yyparse();
 	}
-	else {
-		FILE *file = fopen(argv[1], "r");
-		if (!file) {
-			return fprintf (stderr, "YACC: file %s does not exist!\n", argv[1]);
-		}
-		yyin = file;
 
+	else if (argc == 2){
+		FILE *fin = fopen(argv[1],"r");
+		if (!fin) {
+			return fprintf (stderr, "YACC: Input file %s does not exist!\n", argv[1]);
+		}
+		yyin = fin;
+		while(!feof(yyin)){
+			yyparse();
+		}
+		fclose(fin);
+	}
+
+	else if (argc == 3){
+		FILE *fin = fopen(argv[1], "r");
+		FILE *fout = fopen(argv[2],"w");
+		if (!fin) {
+			return fprintf (stderr, "YACC: Input file %s does not exist!\n", argv[1]);
+		}
+		if (!fout) {
+			return fprintf (stderr, "YACC: Output file %s does not exist!\n", argv[2]);
+		}
+		yyin = fin;
+		yyout = fout;
 		while (!feof(yyin)){
 			yyparse();
 		}
-		fclose(file);
+		fclose(fin);
+		fclose(fout);
 	}
+
+	else {
+		fprintf(stderr, "%s\n" , "YACC: Wrong fromat.");
+		fprintf(stderr, "%s\n" , "YACC: or you can specify the source code path. \nexample --> $./a.out  inputFile outputFile\n");
+	}
+	return 0;
 }
 
 /* Added because panther doesn't have liby.a installed. */
