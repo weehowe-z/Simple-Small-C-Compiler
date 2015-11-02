@@ -2,7 +2,6 @@
 
 #include <stdlib.h>
 #include "y.tab.h"
-
 %}
 
 /*Regular Definations*/
@@ -22,22 +21,22 @@ RB			[]]
 LC			[{]
 RC			[}]
 LETTER		[A-Za-z]
+ASSIGNOP	[=]
 UNARYOP		-|!|\+\+|--|~
-BINARYOP	\*|\/|%|\+|-|<<|>>|>|>=|<|<=|==|!=|&|^|\||&&|\|\||\+=|-=|\*=|\/=|&=|\^=|\|=|<<=|>>=|=
+BINARYOP	\*|\/|%|\+|-|<<|>>|>|>=|<|<=|==|!=|&|^|\||&&|\|\||\+=|-=|\*=|\/=|&=|\^=|\|=|<<=|>>=
 
 %%
  
 
 {DELIM}		{/*Need no actions*/}
 
-{UNARYOP}  	{printf("UNARYOP%s\n", yytext);}
-{BINARYOP}  {printf("BINARYOP%s\n", yytext);}
+{UNARYOP}  	{yylval.charValue = strdup(yytext); return UNARYOP;}
+{BINARYOP}  {yylval.charValue = strdup(yytext); return BINARYOP;}
+{ASSIGNOP}	{return ASSIGNOP;}
+
 {SEMI}		{return SEMI;}
 {COMMA}		{return COMMA;}
 {DOT}		{return DOT;}
-
-{INT}		{yylval = atoi(yytext);return INT;}
-
 if          {return IF;}
 then		{return THEN;}
 else		{return ELSE;}
@@ -52,7 +51,9 @@ int 		{return TYPE;}
 {RB}		{return RB;}
 {LC}		{return LC;}
 {RC}		{return RC;}
-{ID}		{yylval = ID;return ID;}
+
+{INT}		{yylval.intValue = atoi(yytext);return INT;}
+{ID}		{yylval.charValue = strdup(yytext);return ID;}
 
 %%
 

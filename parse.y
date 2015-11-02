@@ -1,30 +1,47 @@
-%code requires
-{
-    #define YYSTYPE double
-    /*Override Bison’s default YYSTYPE */
-}
-
 %{
 #include <stdio.h>
+#include "node.h"
 extern FILE *yyin;
 /*Solve warning: implicit declaration*/
-int yyerror (char *msg);
+int yyerror (const char *msg);
 int yylex();
 %}
 
-%token
-ID INT RATIONAL SEMI COMMA DOT
-BINARYOP UNARYOP ASSIGNOP
-TYPE LP RP LB RB LC RC STRUCT
-RETURN IF THEN ELSE BREAK CONT FOR 
+%union
+{ 
+     int intValue; /* integer value */ 
+     char* charValue; /* string value */ 
+};
+
+%token <intValue>INT    /*bind the yylval type*/
+%token <charValue>ID
+%token <charValue>BINARYOP
+%token <charValue>UNARYOP
+%token SEMI COMMA DOT ASSIGNOP TYPE LP RP LB RB LC RC STRUCT RETURN IF THEN ELSE BREAK CONT FOR 
 
 %nonassoc	BINARYOP 
 %right		UNARYOP
 %left		DOT
 
+%start PROGRAM
+
 %%
 PROGRAM:
 		EXTDEFS
+	|	INT           {printf("haha%d\n", $1);return 0;}
+	|	TEST
+	;
+
+TEST:
+		ID ID				{
+								tokenNode* idval1= new tokenNode($1);
+								tokenNode* idval2= new tokenNode($2);
+								tokenNode* id2 = new tokenNode("id",idval2,NULL);
+								tokenNode* id1 = new tokenNode("id",idval1,id2);
+								tokenNode* test = new tokenNode("test",id1,NULL);
+								parseTree p(test);
+								p.print();
+							}
 	;
 
 EXTDEFS:
@@ -87,7 +104,7 @@ STMT:
 		EXP SEMI
 	|	STMTBLOCK
 	|	RETURN EXP SEMI
-	|	IF LP EXP RP STMT STMT
+	|	IF LP EXP RP STMT STMT /*there is a problem*/
 	|	FOR LP EXP SEMI EXP SEMI EXP RP STMT
 	|	CONT SEMI
 	|	BREAK SEMI
@@ -139,7 +156,6 @@ ARGS:
 	;
 
 
-
 %%
 
 
@@ -165,6 +181,6 @@ int main (int argc, char const *argv[]) {
 }
 
 /* Added because panther doesn't have liby.a installed. */
-int yyerror (char *msg) {
+int yyerror (const char *msg) {
 	return fprintf (stderr, "YACC: %s\n", msg);
 }
