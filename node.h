@@ -227,28 +227,60 @@ public:
 		queue<tokenNode*> q;
 		queue<tokenNode*> tempQueue;
 		queue<string> printQueue;
+		queue<int>remainQueue;
 		queue<int>verticalQueue; 
-		if (root != NULL) q.push(root);
+
+		if (root != NULL) {
+			q.push(root);
+			remainQueue.push(0);
+		}
+
+		int currentPos = 0;
+		
 		while (!q.empty()){
 			
 			p = q.front();
 			q.pop();
-			
 
+			int remain = remainQueue.front();
+			remainQueue.pop();
+			if (currentPos<remain){
+				for (int i = 0; i < remain-currentPos; ++i)
+				{
+					printQueue.push(" ");
+				}
+				currentPos = remain;
+			}
+			cout<<p->name<<" current pos "<<currentPos<<endl; 
 			while (true){
+				int currentPosTemp = 0;
 				for (int i = 0; i < (p->width-p->length)/2; ++i){
 					printQueue.push(" ");
+					currentPosTemp++;
 				}
 
 				printQueue.push(p->name);
+				currentPosTemp += p->length;
 				verticalQueue.push(p->width/2);
 
 				for (int i = 0; i < (p->width-p->length)/2; ++i){
 					printQueue.push(" ");
+					currentPosTemp++;
 				}
-				if ((p->width-p->length)/2<=0) printQueue.push(" ");
 
-				if (p->pfirstChild != NULL) tempQueue.push(p->pfirstChild);
+				if ((p->width-p->length)/2<=0) {
+					printQueue.push(" ");
+					currentPosTemp++;
+				}
+
+				if (p->pfirstChild != NULL) {
+					tempQueue.push(p->pfirstChild);
+					remainQueue.push(currentPos);
+					cout<<"enqueue "<<currentPos<<endl;
+				}
+
+				currentPos += currentPosTemp;
+				
 				if (p->pnextSubling != NULL){
 					p = p->pnextSubling;
 				}
@@ -258,6 +290,7 @@ public:
 			}
 
 			if (q.empty()){
+				currentPos = 0;
 				printQueue.push("\n");
 				while (!verticalQueue.empty()){
 					int verticalPos = verticalQueue.front();
