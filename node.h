@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <queue>
+#include <math.h>
 using namespace std;
 
 class tokenNode
@@ -228,7 +229,7 @@ public:
 		queue<tokenNode*> tempQueue;
 		queue<string> printQueue;
 		queue<int>remainQueue;
-		queue<int>verticalQueue; 
+		queue<int>verticalUpPos; 
 
 		if (root != NULL) {
 			q.push(root);
@@ -251,19 +252,20 @@ public:
 				}
 				currentPos = remain;
 			}
-			cout<<p->name<<" current pos "<<currentPos<<endl; 
+
 			while (true){
 				int currentPosTemp = 0;
-				for (int i = 0; i < (p->width-p->length)/2; ++i){
+				for (int i = 0; i < ceil((p->width-p->length)/2.0); ++i){
 					printQueue.push(" ");
 					currentPosTemp++;
 				}
 
 				printQueue.push(p->name);
-				currentPosTemp += p->length;
-				verticalQueue.push(p->width/2);
 
-				for (int i = 0; i < (p->width-p->length)/2; ++i){
+				currentPosTemp += p->length;
+				
+
+				for (int i = 0; i < ceil((p->width-p->length)/2.0); ++i){
 					printQueue.push(" ");
 					currentPosTemp++;
 				}
@@ -276,7 +278,9 @@ public:
 				if (p->pfirstChild != NULL) {
 					tempQueue.push(p->pfirstChild);
 					remainQueue.push(currentPos);
-					cout<<"enqueue "<<currentPos<<endl;
+					verticalUpPos.push(currentPos + ceil(currentPosTemp/2.0)-1);
+					cout<<"currentPos" <<currentPos<<" ";
+					cout<<"enqueue "<<currentPos + ceil(currentPosTemp/2.0)<<endl;
 				}
 
 				currentPos += currentPosTemp;
@@ -292,20 +296,18 @@ public:
 			if (q.empty()){
 				currentPos = 0;
 				printQueue.push("\n");
-				while (!verticalQueue.empty()){
-					int verticalPos = verticalQueue.front();
-					verticalQueue.pop();
-					for (int i = 0; i < verticalPos; ++i)
-					{
-						//printQueue.push(" ");
+				
+				int previousPos = 0;
+				while (!verticalUpPos.empty()){
+					int verticalPos = verticalUpPos.front();
+					verticalUpPos.pop();
+					for (int i = previousPos; i < verticalPos; ++i){
+						printQueue.push(" ");
 					}
-					//printQueue.push("|");
-					for (int i = 0; i < verticalPos; ++i)
-					{
-						//printQueue.push(" ");
-					}					
+					previousPos = verticalPos + 1;
+					printQueue.push("|");
 				}
-				//printQueue.push("\n");
+				printQueue.push("\n");
 
 				int tempSize = tempQueue.size();
 				for (int i = 0; i < tempSize;++i ){
