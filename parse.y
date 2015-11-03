@@ -38,9 +38,10 @@ PROGRAM:
 								vec.pop_back();
 								tokenNode* program = new tokenNode("program",extdefs,NULL);
 								pTree.changeRoot(program);
-								pTree.fprint(yyout);
+								//pTree.fprint(yyout);
 								pTree.printWidth(yyout);
-								pTree.printpos(yyout);
+								//pTree.printpos(yyout);
+								pTree.printQueue(yyout);
 								return 0;
 							}
 	;
