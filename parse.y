@@ -40,21 +40,8 @@ PROGRAM:
 								pTree.changeRoot(program);
 								pTree.fprint(yyout);
 								pTree.printWidth(yyout);
+								pTree.printpos(yyout);
 								return 0;
-							}
-	//|	INT           {printf("haha%d\n", $1);return 0;}
-	|	TEST        
-	;
-
-TEST:
-		ID ID				{
-								tokenNode* idval1= new tokenNode($1);
-								tokenNode* idval2= new tokenNode($2);
-								tokenNode* id2 = new tokenNode("id",idval2,NULL);
-								tokenNode* id1 = new tokenNode("id",idval1,id2);
-								tokenNode* test = new tokenNode("test",id1,NULL);
-								pTree.changeRoot(test);
-								//pTree.fprint(yyout);
 							}
 	;
 
@@ -117,8 +104,18 @@ STSPEC:
 	|	STRUCT ID
 
 OPTTAG:
-		ID
-	|	/*EMPTY*/
+		ID                  {
+								tokenNode* idval= new tokenNode($1);
+								tokenNode* id = new tokenNode("id",idval,NULL);
+								tokenNode* opttag = new tokenNode("opttag",id,NULL);
+								vec.push_back(opttag);
+							}
+
+	|	/*EMPTY*/			{
+								tokenNode* empty = new tokenNode("epsilon");
+								vec.push_back(empty);
+							}	
+	;
 
 VAR:
 		ID              	{
@@ -182,8 +179,14 @@ DEC:
 								vec.pop_back();
 								tokenNode* dec = new tokenNode("dec",var,NULL);
 								vec.push_back(dec);
-							}		
-	|	VAR ASSIGNOP INIT
+							}	
+
+	|	VAR ASSIGNOP INIT	{
+								tokenNode* var = vec.back();
+								vec.pop_back();
+								tokenNode* dec = new tokenNode("dec",var,NULL);
+								vec.push_back(dec);
+							}	
 	;
 
 INIT:
@@ -208,8 +211,23 @@ ARRS:
 	;
 
 ARGS:
-		EXP COMMA ARGS
-	|	EXP
+		EXP COMMA ARGS      {
+								tokenNode* args = vec.back();
+								vec.pop_back();
+								tokenNode* comma = new tokenNode(",",NULL,args);
+								tokenNode* exp = vec.back();
+								vec.pop_back();
+								exp->pnextSubling = comma;							
+								args = new tokenNode("args",exp,NULL);
+								vec.push_back(args);
+							}	
+
+	|	EXP					{
+								tokenNode* exp = vec.back();
+								vec.pop_back();
+								tokenNode* args = new tokenNode("args",exp,NULL);
+								vec.push_back(args);
+							}	
 	;
 
 

@@ -9,6 +9,7 @@ public:
 	string name;
 	int length;
 	int width;
+	int pos;
 	tokenNode* pfirstChild;
 	tokenNode* pnextSubling;
 	tokenNode(string n = " ", tokenNode* pChild = NULL, tokenNode* pSubling = NULL)
@@ -16,6 +17,7 @@ public:
 		name = n;
 		length = name.length();
 		width = length;
+		pos = 0;
 		pfirstChild = pChild;
 		pnextSubling = pSubling;
 	}
@@ -73,45 +75,46 @@ public:
 		queue<tokenNode*> q;
 		queue<tokenNode*> tempQueue;
 		//queue<int> position;
+		int currentPos = 0;
 		if (root != NULL) q.push(root);
 		while (!q.empty()){
 			p = q.front();
 			q.pop();
 			while (true){
 				//position.push(p->width/2);
+				currentPos = p->pos;
 				fprintf(fout,"%s ", p->name.c_str());
 				for (int i = 0; i < p->width; ++i){
 					fprintf(fout, " ");
 				}
 
-
-				if (p->pfirstChild != NULL) tempQueue.push(p->pfirstChild);
+				if (p->pfirstChild != NULL) {
+					p->pfirstChild->pos = currentPos;
+					tempQueue.push(p->pfirstChild);
+				}
 				if (p->pnextSubling != NULL){
+					currentPos += 2*p->width;
+					//cout<<"current pos "<<currentPos<<endl;
 					p = p->pnextSubling;
+					p->pos = currentPos;
 				}
 				else{
 					break;
 				}
 			}
 			if (q.empty()){
-				/*
 				fprintf(fout,"\n");
-				while (!position.empty()){
-					int pos = position.front();
-					position.pop();
-					for (int i = 0; i < pos; ++i){
-						fprintf(fout, " ");
-					}
-					fprintf(fout, "|");
-					for (int i = 0; i < pos; ++i){
-						fprintf(fout, " ");
-					}					
-				}*/
-				fprintf(fout,"\n");
+				fprintf(fout, "|\n");
+				fprintf(fout, "|\n");
 				int tempSize = tempQueue.size();
 				for (int i = 0; i < tempSize;++i ){
 					q.push(tempQueue.front());
 					tempQueue.pop();
+				}
+				if (!q.empty()){
+					for (int i = 0; i < q.front()->pos; ++i){
+						fprintf(fout, " ");
+					}
 				}
 			}
 		}		
@@ -148,6 +151,37 @@ public:
 		}		
 	}
 
+
+	void printpos(FILE *fout)
+	{
+		getWidth();
+		tokenNode *p;
+		queue<tokenNode*> q;
+		queue<tokenNode*> tempQueue;
+		if (root != NULL) q.push(root);
+		while (!q.empty()){
+			p = q.front();
+			q.pop();
+			while (true){
+				fprintf(fout,"%d ", p->pos);
+				if (p->pfirstChild != NULL) tempQueue.push(p->pfirstChild);
+				if (p->pnextSubling != NULL){
+					p = p->pnextSubling;
+				}
+				else{
+					break;
+				}
+			}
+			if (q.empty()){
+				fprintf(fout,"\n");
+				int tempSize = tempQueue.size();
+				for (int i = 0; i < tempSize;++i ){
+					q.push(tempQueue.front());
+					tempQueue.pop();
+				}
+			}
+		}		
+	}
 	int getWidthHelp(tokenNode* root)
 	{
 		if (root->pfirstChild == NULL){
