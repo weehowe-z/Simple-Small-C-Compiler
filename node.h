@@ -69,60 +69,6 @@ public:
 		root = rt;
 	}
 
-	void fprint(FILE *fout)
-	{
-		getWidth();
-		tokenNode *p;
-		queue<tokenNode*> q;
-		queue<tokenNode*> tempQueue;
-		//queue<int> position;
-		int currentPos = 0;
-		if (root != NULL) q.push(root);
-		while (!q.empty()){
-			p = q.front();
-			q.pop();
-			while (true){
-				//position.push(p->width/2);
-				currentPos = p->pos;
-				for (int i = 0; i < (p->width-p->length)/2; ++i)
-				{
-					fprintf(fout," ");
-				}
-				fprintf(fout,"%s ", p->name.c_str());
-				for (int i = 0; i < (p->width-p->length)/2; ++i){
-					fprintf(fout, " ");
-				}
-
-				if (p->pfirstChild != NULL) {
-					p->pfirstChild->pos = currentPos;
-					tempQueue.push(p->pfirstChild);
-				}
-				if (p->pnextSubling != NULL){
-					currentPos += 2*p->width;
-					//cout<<"current pos "<<currentPos<<endl;
-					p = p->pnextSubling;
-					p->pos = currentPos;
-				}
-				else{
-					break;
-				}
-			}
-			if (q.empty()){
-				fprintf(fout,"\n");
-				int tempSize = tempQueue.size();
-				for (int i = 0; i < tempSize;++i ){
-					q.push(tempQueue.front());
-					tempQueue.pop();
-				}
-				if (!q.empty()){
-					for (int i = 0; i < q.front()->pos; ++i){
-						fprintf(fout, " ");
-					}
-				}
-			}
-		}		
-	}
-
 	void printWidth(FILE *fout)
 	{
 		getWidth();
@@ -153,7 +99,6 @@ public:
 			}
 		}		
 	}
-
 
 	void printpos(FILE *fout)
 	{
@@ -228,8 +173,12 @@ public:
 		queue<tokenNode*> q;
 		queue<tokenNode*> tempQueue;
 		queue<string> printQueue;
+
 		queue<int>remainQueue;
-		queue<int>verticalUpPos; 
+		queue<int>verticalLowPosQueue;
+		queue<int>verticalUpPosQueue;
+		queue<string>printDataQueue;//save tokens and lower vertical sign
+		queue<string>printSignQueue;//save upper vertical sign
 
 		if (root != NULL) {
 			q.push(root);
@@ -248,7 +197,7 @@ public:
 			if (currentPos<remain){
 				for (int i = 0; i < remain-currentPos; ++i)
 				{
-					printQueue.push(" ");
+					printDataQueue.push(" ");
 				}
 				currentPos = remain;
 			}
@@ -256,31 +205,30 @@ public:
 			while (true){
 				int currentPosTemp = 0;
 				for (int i = 0; i < ceil((p->width-p->length)/2.0); ++i){
-					printQueue.push(" ");
+					printDataQueue.push(" ");
 					currentPosTemp++;
 				}
 
-				printQueue.push(p->name);
+				printDataQueue.push(p->name);
 
 				currentPosTemp += p->length;
 				
 
 				for (int i = 0; i < ceil((p->width-p->length)/2.0); ++i){
-					printQueue.push(" ");
+					printDataQueue.push(" ");
 					currentPosTemp++;
 				}
 
 				if ((p->width-p->length)/2<=0) {
-					printQueue.push(" ");
+					printDataQueue.push(" ");
 					currentPosTemp++;
 				}
 
+				if (p != root) verticalUpPosQueue.push(currentPos + ceil(currentPosTemp/2.0)-1);
 				if (p->pfirstChild != NULL) {
 					tempQueue.push(p->pfirstChild);
 					remainQueue.push(currentPos);
-					verticalUpPos.push(currentPos + ceil(currentPosTemp/2.0)-1);
-					cout<<"currentPos" <<currentPos<<" ";
-					cout<<"enqueue "<<currentPos + ceil(currentPosTemp/2.0)<<endl;
+					verticalLowPosQueue.push(currentPos + ceil(currentPosTemp/2.0)-1);
 				}
 
 				currentPos += currentPosTemp;
@@ -295,19 +243,45 @@ public:
 
 			if (q.empty()){
 				currentPos = 0;
-				printQueue.push("\n");
+				printDataQueue.push("\n");
+				//print lower vertical
 				
 				int previousPos = 0;
-				while (!verticalUpPos.empty()){
-					int verticalPos = verticalUpPos.front();
-					verticalUpPos.pop();
+				while (!verticalLowPosQueue.empty()){
+					int verticalPos = verticalLowPosQueue.front();
+					verticalLowPosQueue.pop();
 					for (int i = previousPos; i < verticalPos; ++i){
-						printQueue.push(" ");
+						printDataQueue.push(" ");
 					}
 					previousPos = verticalPos + 1;
-					printQueue.push("|");
+					printDataQueue.push("|");
 				}
-				printQueue.push("\n");
+				printDataQueue.push("\n");
+				
+				//print Upper vertiacl
+				previousPos = 0;
+				while (!verticalUpPosQueue.empty()){
+					int verticalPos = verticalUpPosQueue.front();
+					verticalUpPosQueue.pop();
+					for (int i = previousPos; i < verticalPos; ++i){
+						printSignQueue.push(" ");
+					}
+					previousPos = verticalPos + 1;
+					printSignQueue.push("|");
+				}
+				printSignQueue.push("\n");
+
+				//push back to printQueue
+
+				while (!printSignQueue.empty()){
+					printQueue.push(printSignQueue.front());
+					printSignQueue.pop();
+				}
+				while (!printDataQueue.empty()){
+					printQueue.push(printDataQueue.front());
+					printDataQueue.pop();
+				}
+
 
 				int tempSize = tempQueue.size();
 				for (int i = 0; i < tempSize;++i ){
