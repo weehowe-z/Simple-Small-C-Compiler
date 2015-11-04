@@ -177,7 +177,8 @@ public:
 		queue<int>remainQueue;
 		queue<int>verticalLowPosQueue;
 		queue<int>verticalUpPosQueue;
-		queue<int>underlineQueue;
+		queue<int>underlineSingleQueue;
+		queue< queue<int> > underlineQueue;
 		queue<string>printDataQueue;//save tokens and lower vertical sign
 		queue<string>printSignQueue;//save upper vertical sign
 
@@ -227,7 +228,7 @@ public:
 
 				if (p != root) {
 					verticalUpPosQueue.push(currentPos + ceil(currentPosTemp/2.0)-1);
-					underlineQueue.push(currentPos + ceil(currentPosTemp/2.0)-1);
+					underlineSingleQueue.push(currentPos + ceil(currentPosTemp/2.0)-1);
 				}
 				if (p->pfirstChild != NULL) {
 					tempQueue.push(p->pfirstChild);
@@ -241,6 +242,12 @@ public:
 					p = p->pnextSubling;
 				}
 				else{
+					if (p!=root){
+						underlineQueue.push(underlineSingleQueue);
+						while (!underlineSingleQueue.empty()){
+							underlineSingleQueue.pop();
+						}
+					}
 					break;
 				}
 			}
@@ -251,24 +258,12 @@ public:
 				//print lower vertical
 				
 				int previousPos = 0;
-				int underlineFrontPos = 0;
-				int underlineBackPos = 0;
-				if (!underlineQueue.empty()){
-					underlineFrontPos = underlineQueue.front();
-					underlineBackPos = underlineQueue.back();
-					while (!underlineQueue.empty()){
-						underlineQueue.pop();
-					}
-				}
-				cout<<"underlineBackPos " << underlineBackPos<<endl;
-				cout<<"underlineFrontPos" << underlineFrontPos<<endl;
 
 				while (!verticalLowPosQueue.empty()){
 					int verticalPos = verticalLowPosQueue.front();
 					verticalLowPosQueue.pop();
 					for (int i = previousPos; i < verticalPos; ++i){
-						if (i> underlineFrontPos && i < underlineBackPos) printDataQueue.push("-");
-						else printDataQueue.push(" ");
+							printDataQueue.push(" ");
 					}
 					previousPos = verticalPos + 1;
 					printDataQueue.push("|");
@@ -277,11 +272,26 @@ public:
 				
 				//print Upper vertiacl
 				previousPos = 0;
+
+				int underlineFrontPos = 0;
+				int underlineBackPos = 0;
+				if (!underlineQueue.empty()){
+					underlineFrontPos = underlineQueue.front().front();
+					underlineBackPos = underlineQueue.front().back();
+					underlineQueue.pop();
+				}
+
 				while (!verticalUpPosQueue.empty()){
 					int verticalPos = verticalUpPosQueue.front();
 					verticalUpPosQueue.pop();
 					for (int i = previousPos; i < verticalPos; ++i){
-						printSignQueue.push(" ");
+						if (i > underlineBackPos && !underlineQueue.empty()){
+							underlineFrontPos = underlineQueue.front().front();
+							underlineBackPos = underlineQueue.front().back();
+							underlineQueue.pop();
+						}
+						if (i > underlineFrontPos && i < underlineBackPos) printSignQueue.push("-");
+						else printSignQueue.push(" ");
 					}
 					previousPos = verticalPos + 1;
 					printSignQueue.push("|");
@@ -289,7 +299,6 @@ public:
 				printSignQueue.push("\n");
 
 				//push back to printQueue
-
 				while (!printSignQueue.empty()){
 					printQueue.push(printSignQueue.front());
 					printSignQueue.pop();
