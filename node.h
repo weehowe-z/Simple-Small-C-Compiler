@@ -22,6 +22,18 @@ public:
 		pfirstChild = pChild;
 		pnextSubling = pSubling;
 	}
+	tokenNode(int n = 0, tokenNode* pChild = NULL, tokenNode* pSubling = NULL)
+	{
+		char *intStr;
+		sprintf(intStr, "%d", n);
+		name = string(intStr);
+		length = name.length();
+		width = length;
+		pos = 0;
+		pfirstChild = pChild;
+		pnextSubling = pSubling;
+	}
+
 	~tokenNode(){}
 	void printName()
 	{

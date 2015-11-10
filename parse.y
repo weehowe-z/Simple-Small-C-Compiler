@@ -39,7 +39,7 @@ PROGRAM:
 								tokenNode* program = new tokenNode("program",extdefs,NULL);
 								pTree.changeRoot(program);
 								//pTree.fprint(yyout);
-								pTree.printWidth(yyout);
+								//pTree.printWidth(yyout);
 								//pTree.printpos(yyout);
 								pTree.printQueue(yyout);
 								return 0;
@@ -48,6 +48,7 @@ PROGRAM:
 
 EXTDEFS:
 		EXTDEF EXTDEFS		{
+								cout<<"deal with extdefs -> extdef extdefs\n";
 								tokenNode* extdefs = vec.back();
 								vec.pop_back();
 								tokenNode* extdef = vec.back();
@@ -58,78 +59,170 @@ EXTDEFS:
 							}
 
 	|	/*EMPTY*/			{
-								tokenNode* empty = new tokenNode("epsilon");
-								vec.push_back(empty);
+								cout<<"deal with extdefs -> empty\n";
+								tokenNode* empty = new tokenNode("ϵ");
+								tokenNode* extdefs = new tokenNode("extdefs",empty,NULL);
+								vec.push_back(extdefs);
 							}	
 	;
 
 EXTDEF:
 		SPEC EXTVARS SEMI   {
+								cout<<"deal with extdef -> spec extvars semi\n";
 								tokenNode* semi= new tokenNode(";");
 								tokenNode* extvars = vec.back();
 								vec.pop_back();
 								tokenNode* spec = vec.back();
 								vec.pop_back();
-								spec->pnextSubling = extvars;
 								extvars->pnextSubling = semi;
+								spec->pnextSubling = extvars;
 								tokenNode* extdef = new tokenNode("extdef",spec,NULL);
 								vec.push_back(extdef);
 
 							}
-	|	SPEC FUNC STMTBLOCK
+
+	|	SPEC FUNC STMTBLOCK	{
+								cout<<"deal with extdef -> spec func stmtblock\n";
+								tokenNode* stmtblock= vec.back();
+								vec.pop_back();
+								tokenNode* func = vec.back();
+								vec.pop_back();
+								tokenNode* spec = vec.back();
+								vec.pop_back();
+								func->pnextSubling = stmtblock;
+								spec->pnextSubling = func;
+								tokenNode* extdef = new tokenNode("extdef",spec,NULL);
+								vec.push_back(extdef);	
+							}
 	;
 
 EXTVARS:
 		DEC             	{
+								cout<<"deal with extvars -> dec\n";
 								tokenNode* dec = vec.back();
 								vec.pop_back();
 								tokenNode* extvars = new tokenNode("extvars",dec,NULL);
 								vec.push_back(extvars);
 							}
 
-	|	DEC COMMA EXTVARS
-	|	/*EMPTY*/
+	|	DEC COMMA EXTVARS   {
+								cout<<"deal with extvars -> dec comma extvars\n";
+								tokenNode* extvars = vec.back();
+								vec.pop_back();
+								tokenNode* comma = new tokenNode(",");
+								tokenNode* dec = vec.back();
+								vec.pop_back();
+								dec->pnextSubling = comma;
+								comma->pnextSubling = extvars;
+								extvars = new tokenNode("extvars",dec,NULL);
+								vec.push_back(extvars);
+							}
+
+	|	/*EMPTY*/			{
+								cout<<"deal with extvars -> empty\n";
+								tokenNode* empty = new tokenNode("ϵ");
+								tokenNode* extvars = new tokenNode("extvars",empty,NULL);
+								vec.push_back(extvars);
+							}
 	;
 
 SPEC:
 		TYPE            	{
+								cout<<"deal with spec -> type\n";
 								tokenNode* type = new tokenNode($1);
 								tokenNode* spec = new tokenNode("spec",type,NULL);
 								vec.push_back(spec);
 							}
-	|	STSPEC
+
+	|	STSPEC				{
+								cout<<"deal with spec -> stspec\n";
+								tokenNode* stspec = vec.back();
+								vec.pop_back();
+								tokenNode* spec = new tokenNode("spec",stspec,NULL);
+								vec.push_back(spec);
+							}
 	;
 
 STSPEC:
-		STRUCT OPTTAG LC DEFS RC
-	|	STRUCT ID
+		STRUCT OPTTAG LC DEFS RC	{
+										cout<<"deal with stspec -> struct opttag lc defs rc\n";
+										tokenNode* rc = new tokenNode("}");
+										tokenNode* defs = vec.back();
+										vec.pop_back();
+										tokenNode* lc = new tokenNode("{");
+										tokenNode* opttag = vec.back();
+										vec.pop_back();
+										tokenNode* structToken = vec.back();
+										vec.pop_back();
+										structToken->pnextSubling = opttag;
+										opttag->pnextSubling = lc;
+										lc->pnextSubling = defs;
+										defs->pnextSubling = rc;
+										tokenNode* stspec = new tokenNode("stspec",structToken,NULL);
+										vec.push_back(stspec);
+									}
+
+	|	STRUCT ID           		{
+										cout<<"deal with stspec -> struct id\n";					
+										tokenNode* idval= new tokenNode($2);
+										tokenNode* id = new tokenNode("id",idval,NULL);
+										tokenNode* structToken = new tokenNode("struct",NULL,id);
+										tokenNode* stspec = new tokenNode("stspec",structToken,NULL);
+										vec.push_back(stspec);										
+									}
 
 OPTTAG:
-		ID                  {
-								tokenNode* idval= new tokenNode($1);
-								tokenNode* id = new tokenNode("id",idval,NULL);
-								tokenNode* opttag = new tokenNode("opttag",id,NULL);
-								vec.push_back(opttag);
-							}
+	ID                  			{
+										cout<<"deal with opttag -> id\n";
+										tokenNode* idval= new tokenNode($1);
+										tokenNode* id = new tokenNode("id",idval,NULL);
+										tokenNode* opttag = new tokenNode("opttag",id,NULL);
+										vec.push_back(opttag);
+									}
 
-	|	/*EMPTY*/			{
-								tokenNode* empty = new tokenNode("epsilon");
-								vec.push_back(empty);
-							}	
+	|	/*EMPTY*/					{
+										cout<<"deal with opttag -> empty\n";
+										tokenNode* empty = new tokenNode("ϵ");
+										tokenNode* opttag = new tokenNode("opttag",empty,NULL);
+										vec.push_back(opttag);
+									}	
 	;
 
 VAR:
-		ID              	{
-								tokenNode* idval= new tokenNode($1);
-								tokenNode* id = new tokenNode("id",idval,NULL);
-								tokenNode* var = new tokenNode("var",id,NULL);
-								vec.push_back(var);
-							}
-	|	VAR LB INT RB
+		ID              			{
+										cout<<"deal with var -> id\n";
+										tokenNode* idval= new tokenNode($1);
+										tokenNode* id = new tokenNode("id",idval,NULL);
+										tokenNode* var = new tokenNode("var",id,NULL);
+										vec.push_back(var);
+									}
+
+	|	VAR LB INT RB				{
+										cout<<"deal with var -> var lb int rb\n";
+										tokenNode* rb = new tokenNode("]");
+										tokenNode* integer = new tokenNode($3,NULL,rb);
+										tokenNode* lb = new tokenNode("[",NULL,integer);
+										tokenNode* var = vec.back();
+										vec.pop_back();
+										var->pnextSubling = lb;
+										var = new tokenNode("var",var,NULL);
+										vec.push_back(var);
+									}
 	;
 
 FUNC:
-		ID LP PARAS RP
+		ID LP PARAS RP				{
+										cout<<"deal with func -> id lp paras rp\n";
+										tokenNode* rp = new tokenNode(")");
+										tokenNode* paras = vec.back();
+										vec.pop_back();
+										paras->pnextSubling = rp;
+										tokenNode* lp = new tokenNode("(",NULL,paras);
+										tokenNode* idval= new tokenNode($1);
+										tokenNode* id = new tokenNode("id",idval,lp);
+										tokenNode* func = new tokenNode("func",id,NULL);
+										vec.push_back(func);
+									}
 	;
 
 PARAS:

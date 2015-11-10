@@ -1,10 +1,10 @@
 #########################################################################
 # File Name: easytest.sh
-# Author: ma6174
-# mail: ma6174@163.com
 # Created Time: Mon 02 Nov 2015 06:46:41 PM CST
 #########################################################################
 #!/bin/bash
 make clean;
 make;
 ./a.out
+#./a.out reference/testcase/arth/arth.sc
+./a.out reference/testcase/fib/fib.sc
