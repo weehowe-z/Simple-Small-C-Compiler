@@ -17,6 +17,7 @@ public:
 	{
 		name = n;
 		length = name.length();
+		if (name == "ϵ") length = 1; 
 		width = length;
 		pos = 0;
 		pfirstChild = pChild;
@@ -28,6 +29,7 @@ public:
 		sprintf(intStr, "%d", n);
 		name = string(intStr);
 		length = name.length();
+		if (name == "ϵ") length = 1;
 		width = length;
 		pos = 0;
 		pfirstChild = pChild;
