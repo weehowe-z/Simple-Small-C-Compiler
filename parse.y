@@ -8,6 +8,7 @@ extern FILE *yyout;
 /*Solve warning: implicit declaration*/
 int yyerror (const char *msg);
 int yylex();
+bool printFlag = true;
 parseTree pTree;
 vector<tokenNode*> vec;
 %}
@@ -42,8 +43,8 @@ PROGRAM:
 								//pTree.fprint(yyout);
 								//pTree.printWidth(yyout);
 								//pTree.printpos(yyout);
-								pTree.printQueue(yyout);
-								return 0;
+								//pTree.printQueue(yyout);
+								//return 0;
 							}
 	;
 
@@ -331,7 +332,17 @@ STMT:
 															vec.push_back(stmt);
 														}
 
-	|	IF LP EXP RP STMT STMT /*there is a problem*/
+	|	IF LP EXP RP STMT ESTMT /*there is a problem*/  {
+															cout<<"deal with stmt -> if lp exp rp stmt estmt\n";
+															tokenNode* estmt = vec.back();vec.pop_back();
+															tokenNode* stmt = vec.back();vec.pop_back();stmt->pnextSubling = estmt;
+															tokenNode* rp = new tokenNode(")",NULL,stmt);
+															tokenNode* exp = vec.back();vec.pop_back();exp->pnextSubling = rp;
+															tokenNode* lp = new tokenNode("(",NULL,exp);
+															tokenNode* ifToken = new tokenNode("IF",NULL,lp);
+															stmt = new tokenNode("STMT",ifToken,NULL);
+															vec.push_back(stmt);
+														}
 
 	|	FOR LP EXP SEMI EXP SEMI EXP RP STMT            {
 															cout<<"deal with stmt -> for loop \n";
@@ -371,6 +382,20 @@ STMT:
 															vec.push_back(stmt);
 														} 
 	;
+
+ESTMT:
+		ELSE STMT                                       {
+															cout<<"deal with estmt -> else stmt\n";
+															tokenNode* stmt = vec.back();vec.pop_back();
+															tokenNode* elseToken = new tokenNode("ELSE",NULL,stmt);
+															tokenNode* estmt = new tokenNode("ESTMT",elseToken,NULL);
+															vec.push_back(estmt);
+														}
+
+	;
+
+
+
 
 DEFS:
 		DEF DEFS                                        {
@@ -602,7 +627,11 @@ int main (int argc, char const *argv[]) {
 	if (argc == 1){
 		fprintf(stderr, "%s\n", "YACC: please write your code in the shell. input CTRL-D to exit.");
 		fprintf(stderr, "%s\n", "YACC: or you can specify the source code path. \nexample --> $./a.out  inputFile outputFile\n");
-		return yyparse();
+		yyparse();
+		if (printFlag) {
+			pTree.printQueue(yyout);
+		}
+		return 0;
 	}
 
 	else if (argc == 2){
@@ -613,6 +642,9 @@ int main (int argc, char const *argv[]) {
 		yyin = fin;
 		while(!feof(yyin)){
 			yyparse();
+		}
+		if (printFlag) {
+			pTree.printQueue(yyout);
 		}
 		fclose(fin);
 	}
@@ -631,6 +663,9 @@ int main (int argc, char const *argv[]) {
 		while (!feof(yyin)){
 			yyparse();
 		}
+		if (printFlag) {
+			pTree.printQueue(yyout);
+		}
 		fclose(fin);
 		fclose(fout);
 	}
@@ -644,5 +679,6 @@ int main (int argc, char const *argv[]) {
 
 /* Added because panther doesn't have liby.a installed. */
 int yyerror (const char *msg) {
+	printFlag = false;
 	return fprintf (stderr, "YACC: %s\n", msg);
 }

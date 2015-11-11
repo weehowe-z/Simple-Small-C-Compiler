@@ -5,6 +5,6 @@
 #!/bin/bash
 make clean;
 make;
-./a.out
-#./a.out reference/testcase/arth/arth.sc
+#./a.out
+./a.out reference/testcase/arth/arth.sc  test.out
 #./a.out reference/testcase/fib/fib.sc

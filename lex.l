@@ -54,7 +54,7 @@ int 		{yylval.charValue = strdup(yytext);return TYPE;}
 {RC}		{return RC;}
 
 {INT}		{yylval.intValue = atoi(yytext);return INT;}
-{ID}		{yylval.charValue = strdup(yytext);printf("catch token %s\n",yytext ); return ID;}
+{ID}		{yylval.charValue = strdup(yytext);return ID;}
 
 %%
 
