@@ -26,6 +26,9 @@ vector<tokenNode*> vec;
 %token <charValue>TYPE
 %token SEMI COMMA DOT ASSIGNOP LP RP LB RB LC RC STRUCT RETURN IF THEN ELSE BREAK CONT FOR
 
+%right	NOELSE ELSE
+%nonassoc   PREC1
+%nonassoc   ID
 %nonassoc	BINARYOP 
 %right		UNARYOP
 %left		DOT
@@ -40,7 +43,6 @@ PROGRAM:
 								vec.pop_back();
 								tokenNode* program = new tokenNode("PROGRAM",extdefs,NULL);
 								pTree.changeRoot(program);
-								//pTree.fprint(yyout);
 								//pTree.printWidth(yyout);
 								//pTree.printpos(yyout);
 								//pTree.printQueue(yyout);
@@ -85,12 +87,9 @@ EXTDEF:
 
 	|	SPEC FUNC STMTBLOCK	{
 								cout<<"deal with extdef -> spec func stmtblock\n";
-								tokenNode* stmtblock= vec.back();
-								vec.pop_back();
-								tokenNode* func = vec.back();
-								vec.pop_back();
-								tokenNode* spec = vec.back();
-								vec.pop_back();
+								tokenNode* stmtblock= vec.back();vec.pop_back();
+								tokenNode* func = vec.back();vec.pop_back();
+								tokenNode* spec = vec.back();vec.pop_back();
 								func->pnextSubling = stmtblock;
 								spec->pnextSubling = func;
 								tokenNode* extdef = new tokenNode("EXTDEF",spec,NULL);
@@ -144,6 +143,13 @@ SPEC:
 								tokenNode* spec = new tokenNode("SPEC",stspec,NULL);
 								vec.push_back(spec);
 							}
+	/*|						{
+								cout<<"deal with spec -> empty\n";
+								tokenNode* empty = new tokenNode("ϵ");
+								tokenNode* spec = new tokenNode("spec",empty,NULL);
+								vec.push_back(spec);
+							}
+	*/
 	;
 
 STSPEC:
@@ -192,7 +198,7 @@ OPTTAG:
 	;
 
 VAR:
-		ID              			{
+		ID               			{
 										cout<<"deal with var -> id\n";
 										tokenNode* idval= new tokenNode($1);
 										tokenNode* id = new tokenNode("ID",idval,NULL);
@@ -217,9 +223,7 @@ FUNC:
 		ID LP PARAS RP				{
 										cout<<"deal with func -> id lp paras rp\n";
 										tokenNode* rp = new tokenNode(")");
-										tokenNode* paras = vec.back();
-										vec.pop_back();
-										paras->pnextSubling = rp;
+										tokenNode* paras = vec.back();vec.pop_back();paras->pnextSubling = rp;
 										tokenNode* lp = new tokenNode("(",NULL,paras);
 										tokenNode* idval= new tokenNode($1);
 										tokenNode* id = new tokenNode("ID",idval,lp);
@@ -231,12 +235,9 @@ FUNC:
 PARAS:
 		PARA COMMA PARAS            {
 										cout<<"deal with paras -> para comma paras\n";
-										tokenNode* paras = vec.back();
-										vec.pop_back();
+										tokenNode* paras = vec.back();vec.pop_back();
 										tokenNode* comma = new tokenNode(",",NULL,paras);
-										tokenNode* para = vec.back();
-										vec.pop_back();
-										para->pnextSubling = comma;
+										tokenNode* para = vec.back();vec.pop_back();para->pnextSubling = comma;
 										paras = new tokenNode("PARAS",para,NULL);
 										vec.push_back(paras);
 									}
@@ -247,6 +248,12 @@ PARAS:
 										vec.pop_back();
 										tokenNode* paras = new tokenNode("PARAS",para,NULL);
 										vec.push_back(paras);
+									}
+	|	/*EMPTY*/ /*CHANGE!!!*/     {
+										cout<<"deal with paras -> empty\n";
+										tokenNode* empty = new tokenNode("ϵ");
+										tokenNode* paras = new tokenNode("PARAS",empty,NULL);
+										vec.push_back(paras);									
 									}
 	;
 
@@ -261,24 +268,14 @@ PARA:
 										tokenNode* para = new tokenNode("PARA",spec,NULL);
 										vec.push_back(para);
 									}
-	|	/*EMPTY*/ /*CHANGE!!!*/     {
-										cout<<"deal with para -> empty\n";
-										tokenNode* empty = new tokenNode("ϵ");
-										tokenNode* para = new tokenNode("PARA",empty,NULL);
-										vec.push_back(para);									
-									}
 	;
 
 STMTBLOCK:							
 		LC DEFS STMTS RC            {
 										cout<<"deal with stmtblock -> lc defs stmts rc\n";
 										tokenNode* rc = new tokenNode("}");
-										tokenNode* stmts = vec.back();
-										vec.pop_back();
-										stmts->pnextSubling = rc;
-										tokenNode* defs = vec.back();
-										vec.pop_back();
-										defs->pnextSubling = stmts;
+										tokenNode* stmts = vec.back();vec.pop_back();stmts->pnextSubling = rc;
+										tokenNode* defs = vec.back();vec.pop_back();defs->pnextSubling = stmts;
 										tokenNode* lc = new tokenNode("{",NULL,defs);
 										tokenNode* stmtblock = new tokenNode("STMTBLOCK",lc,NULL);
 										vec.push_back(stmtblock);
@@ -288,11 +285,8 @@ STMTBLOCK:
 STMTS:
 		STMT STMTS                  {
 										cout<<"deal with stmts -> stmt stmts\n";
-										tokenNode* stmts = vec.back();
-										vec.pop_back();
-										tokenNode* stmt = vec.back();
-										vec.pop_back();
-										stmt->pnextSubling = stmts;
+										tokenNode* stmts = vec.back();vec.pop_back();
+										tokenNode* stmt = vec.back();vec.pop_back();stmt->pnextSubling = stmts;
 										stmts = new tokenNode("STMTS",stmt,NULL);
 										vec.push_back(stmts);
 									}
@@ -317,9 +311,9 @@ STMT:
 														}
 	|	STMTBLOCK                                       {
 															cout<<"deal with stmt -> stmtblock\n";
-															tokenNode* stmtblock = vec.back();
-															vec.pop_back();
+															tokenNode* stmtblock = vec.back();vec.pop_back();
 															tokenNode* stmt = new tokenNode("STMT",stmtblock,NULL);
+															vec.push_back(stmt);
 														}
 	|	RETURN EXP SEMI                                 {
 															cout<<"deal with stmt -> stmtblock\n";
@@ -332,7 +326,7 @@ STMT:
 															vec.push_back(stmt);
 														}
 
-	|	IF LP EXP RP STMT ESTMT /*there is a problem*/  {
+	|	IF LP EXP RP STMT ESTMT                         {
 															cout<<"deal with stmt -> if lp exp rp stmt estmt\n";
 															tokenNode* estmt = vec.back();vec.pop_back();
 															tokenNode* stmt = vec.back();vec.pop_back();stmt->pnextSubling = estmt;
@@ -346,23 +340,16 @@ STMT:
 
 	|	FOR LP EXP SEMI EXP SEMI EXP RP STMT            {
 															cout<<"deal with stmt -> for loop \n";
-															tokenNode* stmt = vec.back();
-															vec.pop_back();
+															tokenNode* stmt = vec.back();vec.pop_back();
 															tokenNode* rp = new tokenNode(")",NULL,stmt);
-															tokenNode* exp = vec.back();
-															vec.pop_back();
-															exp->pnextSubling = rp;
+															tokenNode* exp = vec.back();vec.pop_back();exp->pnextSubling = rp;
 															tokenNode* semi = new tokenNode(";",NULL,exp);
-															exp = vec.back();
-															vec.pop_back();
-															exp->pnextSubling = semi;
+															exp = vec.back();vec.pop_back();exp->pnextSubling = semi;
 															semi = new tokenNode(";",NULL,exp);
-															exp = vec.back();
-															vec.pop_back();
-															exp->pnextSubling = semi;
+															exp = vec.back();vec.pop_back();exp->pnextSubling = semi;
 															tokenNode* lp = new tokenNode("(",NULL,exp);
 															tokenNode* forToken = new tokenNode("FOR",NULL,lp);
-															stmt = new tokenNode("STMT",NULL,forToken);
+															stmt = new tokenNode("STMT",forToken,NULL);
 															vec.push_back(stmt);
 														}
 
@@ -384,11 +371,17 @@ STMT:
 	;
 
 ESTMT:
-		ELSE STMT                                       {
+		ELSE STMT           		                    {
 															cout<<"deal with estmt -> else stmt\n";
 															tokenNode* stmt = vec.back();vec.pop_back();
 															tokenNode* elseToken = new tokenNode("ELSE",NULL,stmt);
 															tokenNode* estmt = new tokenNode("ESTMT",elseToken,NULL);
+															vec.push_back(estmt);
+														}
+	|						%prec NOELSE                {
+															cout<<"deal with estmt -> empty\n";
+															tokenNode* empty = new tokenNode("ϵ");
+															tokenNode* estmt = new tokenNode("ESTMT",empty,NULL);
 															vec.push_back(estmt);
 														}
 
@@ -398,7 +391,7 @@ ESTMT:
 
 
 DEFS:
-		DEF DEFS                                        {
+		DEF DEFS                                       {
 															cout<<"deal with defs -> def defs\n";
 															tokenNode* defs = vec.back();
 															vec.pop_back();
@@ -409,7 +402,7 @@ DEFS:
 															vec.push_back(defs);
 														}
 
-	|	/*EMPTY*/										{
+	|	/*EMPTY*/	        %prec PREC1            				{
 															cout<<"deal with defs -> empty\n";
 															tokenNode* empty = new tokenNode("ϵ");
 															tokenNode* defs = new tokenNode("DEFS",empty,NULL);
@@ -418,16 +411,19 @@ DEFS:
 	;
      
 DEF:
-		SPEC DECS SEMI                                  {
+		SPEC DECS SEMI      			                {
 															cout<<"deal with def -> spec decs semi\n";
 															tokenNode* semi = new tokenNode(";");
-															tokenNode* decs = vec.back();
-															vec.pop_back();
-															decs->pnextSubling = semi;
-															tokenNode* spec = vec.back();
-															vec.pop_back();
-															spec->pnextSubling = decs;
+															tokenNode* decs = vec.back();vec.pop_back();decs->pnextSubling = semi;
+															tokenNode* spec = vec.back();vec.pop_back();spec->pnextSubling = decs;
 															tokenNode* def = new tokenNode("DEF",spec,NULL);
+															vec.push_back(def);
+														}
+	|   DECS SEMI          							    {
+															cout<<"deal with def -> decs semi\n";
+															tokenNode* semi = new tokenNode(";");
+															tokenNode* decs = vec.back();vec.pop_back();decs->pnextSubling = semi;
+															tokenNode* def = new tokenNode("DEF",decs,NULL);
 															vec.push_back(def);
 														}
 	;
@@ -556,7 +552,7 @@ EXP:
 								vec.push_back(exp);
 	                        }
 	|	EXP BINARYOP EXP    {
-								cout<<"deal with exp -> binaryop exp\n";
+								cout<<"deal with exp -> exp binaryop exp\n";
 								tokenNode* exp = vec.back();
 								vec.pop_back();
 								tokenNode* binaryopVal = new tokenNode($2);

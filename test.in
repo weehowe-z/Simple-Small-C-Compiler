@@ -1,4 +1,6 @@
-int x;
-int xy;
-int xyz;
-int xyza;
+int main()
+{
+	if (a){
+		p=ans[0]+a+1;
+	}
+}
