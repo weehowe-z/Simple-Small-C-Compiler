@@ -6,5 +6,5 @@
 make clean;
 make;
 ./a.out
-./a.out reference/testcase/arth/arth.sc
+#./a.out reference/testcase/arth/arth.sc
 #./a.out reference/testcase/fib/fib.sc
