@@ -41,6 +41,7 @@ if          {return IF;}
 then		{return THEN;}
 else		{return ELSE;}
 break		{return BREAK;}
+return		{return RETURN;}
 continue	{return CONT;}
 for         {return FOR;}
 struct      {return STRUCT;}
@@ -53,7 +54,7 @@ int 		{yylval.charValue = strdup(yytext);return TYPE;}
 {RC}		{return RC;}
 
 {INT}		{yylval.intValue = atoi(yytext);return INT;}
-{ID}		{yylval.charValue = strdup(yytext);return ID;}
+{ID}		{yylval.charValue = strdup(yytext);printf("catch token %s\n",yytext ); return ID;}
 
 %%
 
