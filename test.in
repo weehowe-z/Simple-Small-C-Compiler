@@ -1,4 +1,8 @@
 int main()
 {
-	p=ab+cd+213;
+	int a;
+	int xy;
+	int xyz;
+	read(a);
+	write(a+b);
 }

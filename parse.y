@@ -30,7 +30,7 @@ vector<tokenNode*> vec;
 
 %right	NOELSE ELSE
 %right 		ASSIGNOP
-%nonassoc	BINARYOP 
+%left    	BINARYOP 
 %right		UNARYOP
 %left		DOT
 
@@ -44,8 +44,7 @@ PROGRAM:
 								vec.pop_back();
 								tokenNode* program = new tokenNode("PROGRAM",extdefs,NULL);
 								pTree.changeRoot(program);
-								//pTree.printWidth(yyout);
-								//pTree.printpos(yyout);
+								pTree.printWidth(yyout);
 								//pTree.printQueue(yyout);
 								//return 0;
 							}
@@ -194,7 +193,6 @@ OPTTAG:
 VAR:
 		ID               			{
 										cout<<"deal with var -> id \n";
-										cout<<"2"<<$1<<endl;
 										tokenNode* idval= new tokenNode($1);
 										tokenNode* id = new tokenNode("ID",idval,NULL);
 										tokenNode* var = new tokenNode("VAR",id,NULL);
@@ -683,6 +681,6 @@ int yyerror (const char *msg) {
 	printFlag = false;
 	fprintf (stderr, "YACC: %s\n", msg);
 	fprintf(stderr, "YACC: line %d\n", yylineno);
-	fprintf(stderr, "YACC: before %s\n", yytext);
+	fprintf(stderr, "YACC: at %s\n", yytext);
 	return -1;
 }

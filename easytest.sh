@@ -6,6 +6,6 @@
 make clean;
 make;
 #./a.out
-./a.out test.in
-#./a.out reference/testcase/arth/arth.sc
+./a.out test.in test.out
+#./a.out reference/testcase/arth/arth.sc  test.out
 #./a.out reference/testcase/fib/fib.sc

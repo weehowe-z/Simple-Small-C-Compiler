@@ -19,7 +19,6 @@ public:
 		length = name.length();
 		if (name == "ϵ") length = 1; 
 		width = length;
-		pos = 0;
 		pfirstChild = pChild;
 		pnextSubling = pSubling;
 	}
@@ -114,36 +113,7 @@ public:
 		}		
 	}
 
-	void printpos(FILE *fout)
-	{
-		getWidth();
-		tokenNode *p;
-		queue<tokenNode*> q;
-		queue<tokenNode*> tempQueue;
-		if (root != NULL) q.push(root);
-		while (!q.empty()){
-			p = q.front();
-			q.pop();
-			while (true){
-				fprintf(fout,"%d ", p->pos);
-				if (p->pfirstChild != NULL) tempQueue.push(p->pfirstChild);
-				if (p->pnextSubling != NULL){
-					p = p->pnextSubling;
-				}
-				else{
-					break;
-				}
-			}
-			if (q.empty()){
-				fprintf(fout,"\n");
-				int tempSize = tempQueue.size();
-				for (int i = 0; i < tempSize;++i ){
-					q.push(tempQueue.front());
-					tempQueue.pop();
-				}
-			}
-		}		
-	}
+
 	int getWidthHelp(tokenNode* root)
 	{
 		if (root->pfirstChild == NULL){
@@ -158,7 +128,7 @@ public:
 				count++;
 			}
 			width--;
-			root->width = max(root->width,width);
+			root->width = max(root->length,width);
 			return root->width;
 		}
 	}
@@ -220,34 +190,37 @@ public:
 
 			while (true){
 				int currentPosTemp = 0;
-				for (int i = 0; i < ceil((p->width-p->length)/2.0); ++i){
+				for (int i = 0; i < ((p->width-p->length)/2.0); ++i){
 					printDataQueue.push(" ");
 					currentPosTemp++;
 				}
-
 				printDataQueue.push(p->name);
 
 				currentPosTemp += p->length;
-				
-
-				for (int i = 0; i < ceil((p->width-p->length)/2.0); ++i){
+				for (int i = 0; i < (p->width-p->length)/2.0; ++i){
 					printDataQueue.push(" ");
 					currentPosTemp++;
 				}
-
-				if ((p->width-p->length)/2<=0) {
+				if ((p->width-p->length)/2==0) {
 					printDataQueue.push(" ");
 					currentPosTemp++;
 				}
-
 				if (p != root) {
-					verticalUpPosQueue.push(currentPos + ceil(currentPosTemp/2.0)-1);
-					underlineSingleQueue.push(currentPos + ceil(currentPosTemp/2.0)-1);
+					verticalUpPosQueue.push(currentPos + p->width/2);
+					underlineSingleQueue.push(currentPos + p->width/2);
 				}
 				if (p->pfirstChild != NULL) {
 					tempQueue.push(p->pfirstChild);
-					remainQueue.push(currentPos);
-					verticalLowPosQueue.push(currentPos + ceil(currentPosTemp/2.0)-1);
+					if (p->pfirstChild->pnextSubling!=NULL){
+						remainQueue.push(currentPos);
+					}
+					else if (p->width%2!=0&&p->pfirstChild->width%2==0){
+						remainQueue.push(currentPos+ceil((p->width-p->pfirstChild->width)/2.0)-1);
+					}
+					else {
+						remainQueue.push(currentPos+ceil((p->width-p->pfirstChild->width)/2.0));
+					}
+					verticalLowPosQueue.push(currentPos + p->width/2);
 				}
 
 				currentPos += currentPosTemp;
