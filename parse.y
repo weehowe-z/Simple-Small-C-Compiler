@@ -23,16 +23,36 @@ vector<tokenNode*> vec;
 
 %token <intValue>INT    /*bind the yylval type*/
 %token <charValue>ID
-%token <charValue>BINARYOP
 %token <charValue>UNARYOP
+%token <charValue>BINARYOP
+%token <charValue>PLUS
+%token <charValue>MINUS
+%token <charValue>SHIFTOP
+%token <charValue>COMPAREOP
+%token <charValue>EQUALOP
+%token <charValue>BITAND
+%token <charValue>BITXOR
+%token <charValue>BITOR
+%token <charValue>LOGICALAND
+%token <charValue>LOGICALOR
+%token <charValue>BINASSIGNOP
 %token <charValue>TYPE
 %token SEMI COMMA DOT ASSIGNOP LP RP LB RB LC RC STRUCT RETURN IF THEN ELSE BREAK CONT FOR
 
 %right	NOELSE ELSE
-%right 		ASSIGNOP
+%right 		ASSIGNOP BINASSIGNOP
+%left       LOGICALOR
+%left		LOGICALAND
+%left       BITOR
+%left		BITXOR
+%left       BITAND
+%left		EQUALOP
+%left		COMPAREOP 
+%left		SHIFTOP 
+%left		PLUS MINUS
 %left    	BINARYOP 
-%right		UNARYOP
-%left		DOT
+%right		UNARYOP UNMINUS
+%left		DOT LP RP LB RB
 
 %start PROGRAM
 
@@ -40,13 +60,9 @@ vector<tokenNode*> vec;
 PROGRAM:
 		EXTDEFS				{
 								cout<<"deal with PROGRAM -> extdefs\n";
-								tokenNode* extdefs = vec.back();
-								vec.pop_back();
+								tokenNode* extdefs = vec.back();vec.pop_back();
 								tokenNode* program = new tokenNode("PROGRAM",extdefs,NULL);
 								pTree.changeRoot(program);
-								pTree.printWidth(yyout);
-								//pTree.printQueue(yyout);
-								//return 0;
 							}
 	;
 
@@ -149,17 +165,12 @@ STSPEC:
 		STRUCT OPTTAG LC DEFS RC	{
 										cout<<"deal with stspec -> struct opttag lc defs rc\n";
 										tokenNode* rc = new tokenNode("}");
-										tokenNode* defs = vec.back();
-										vec.pop_back();
-										tokenNode* lc = new tokenNode("{");
-										tokenNode* opttag = vec.back();
-										vec.pop_back();
-										tokenNode* structToken = vec.back();
-										vec.pop_back();
-										structToken->pnextSubling = opttag;
-										opttag->pnextSubling = lc;
-										lc->pnextSubling = defs;
+										tokenNode* defs = vec.back();vec.pop_back();
 										defs->pnextSubling = rc;
+										tokenNode* lc = new tokenNode("{",NULL,defs);
+										tokenNode* opttag = vec.back();vec.pop_back();
+										opttag->pnextSubling = lc;
+										tokenNode* structToken = new tokenNode("STRUCT",NULL,opttag);
 										tokenNode* stspec = new tokenNode("STSPEC",structToken,NULL);
 										vec.push_back(stspec);
 									}
@@ -386,10 +397,8 @@ ESTMT:
 DEFS:
 		DEF DEFS                                       {
 															cout<<"deal with defs -> def defs\n";
-															tokenNode* defs = vec.back();
-															vec.pop_back();
-															tokenNode* def = vec.back();
-															vec.pop_back();
+															tokenNode* defs = vec.back();vec.pop_back();
+															tokenNode* def = vec.back();vec.pop_back();
 															def->pnextSubling = defs;
 															defs = new tokenNode("DEFS",def,NULL);
 															vec.push_back(defs);
@@ -428,8 +437,7 @@ DECS:
 							}
 	|	DEC                 {
 								cout<<"deal with decs -> dec\n";
-								tokenNode* dec = vec.back();
-								vec.pop_back();
+								tokenNode* dec = vec.back();vec.pop_back();
 								tokenNode* decs = new tokenNode("DECS",dec,NULL);
 								vec.push_back(decs);								
 							}
@@ -438,8 +446,7 @@ DECS:
 DEC:
 		VAR					{
 								cout<<"deal with dec -> var\n";
-								tokenNode* var = vec.back();
-								vec.pop_back();
+								tokenNode* var = vec.back();vec.pop_back();
 								tokenNode* dec = new tokenNode("DEC",var,NULL);
 								vec.push_back(dec);
 							}	
@@ -537,14 +544,134 @@ EXP:
 								exp = new tokenNode("EXP",unaryop,NULL);
 								vec.push_back(exp);
 	                        }
-	|	EXP BINARYOP EXP    {
-								cout<<"deal with exp -> exp binaryop exp\n";
-								tokenNode* exp = vec.back();
-								vec.pop_back();
-								tokenNode* binaryopVal = new tokenNode($2);
-								tokenNode* binaryop = new tokenNode("BINARYOP",binaryopVal,exp);
-								exp = vec.back();
-								vec.pop_back();
+
+	|	EXP BINARYOP EXP    	{
+								cout<<"deal with exp -> exp BINARYOP exp\n";
+								tokenNode* exp = vec.back();vec.pop_back();
+								tokenNode* binaryop = new tokenNode($2,NULL,exp);
+								exp = vec.back();vec.pop_back();
+								exp->pnextSubling = binaryop;
+								exp = new tokenNode("EXP",exp,NULL);
+								vec.push_back(exp);	
+							}	
+
+	|	MINUS EXP %prec	UNMINUS {
+								cout<<"deal with exp -> MINUS exp\n";
+								tokenNode* exp = vec.back();vec.pop_back();
+								tokenNode* binaryop = new tokenNode($1,NULL,exp);
+								exp = new tokenNode("EXP",binaryop,NULL);
+								vec.push_back(exp);	
+							}	
+
+	|	EXP MINUS EXP    	{
+								cout<<"deal with exp -> exp MINUS exp\n";
+								tokenNode* exp = vec.back();vec.pop_back();
+								tokenNode* binaryop = new tokenNode($2,NULL,exp);
+								exp = vec.back();vec.pop_back();
+								exp->pnextSubling = binaryop;
+								exp = new tokenNode("EXP",exp,NULL);
+								vec.push_back(exp);	
+							}	
+
+
+	|	EXP PLUS EXP    	{
+								cout<<"deal with exp -> exp PLUS exp\n";
+								tokenNode* exp = vec.back();vec.pop_back();
+								tokenNode* binaryop = new tokenNode($2,NULL,exp);
+								exp = vec.back();vec.pop_back();
+								exp->pnextSubling = binaryop;
+								exp = new tokenNode("EXP",exp,NULL);
+								vec.push_back(exp);	
+							}	       
+
+
+	|	EXP SHIFTOP EXP    	{
+								cout<<"deal with exp -> exp SHIFTOP exp\n";
+								tokenNode* exp = vec.back();vec.pop_back();
+								tokenNode* binaryop = new tokenNode($2,NULL,exp);
+								exp = vec.back();vec.pop_back();
+								exp->pnextSubling = binaryop;
+								exp = new tokenNode("EXP",exp,NULL);
+								vec.push_back(exp);	
+							}	                     
+
+	|	EXP COMPAREOP EXP    	{
+								cout<<"deal with exp -> exp COMPAREOP exp\n";
+								tokenNode* exp = vec.back();vec.pop_back();
+								tokenNode* binaryop = new tokenNode($2,NULL,exp);
+								exp = vec.back();vec.pop_back();
+								exp->pnextSubling = binaryop;
+								exp = new tokenNode("EXP",exp,NULL);
+								vec.push_back(exp);	
+							}
+
+
+	|	EXP EQUALOP EXP    	{
+								cout<<"deal with exp -> exp EQUALOP exp\n";
+								tokenNode* exp = vec.back();vec.pop_back();
+								tokenNode* binaryop = new tokenNode($2,NULL,exp);
+								exp = vec.back();vec.pop_back();
+								exp->pnextSubling = binaryop;
+								exp = new tokenNode("EXP",exp,NULL);
+								vec.push_back(exp);	
+							}
+
+
+	|	EXP BITXOR EXP    	{
+								cout<<"deal with exp -> exp BITXOR exp\n";
+								tokenNode* exp = vec.back();vec.pop_back();
+								tokenNode* binaryop = new tokenNode($2,NULL,exp);
+								exp = vec.back();vec.pop_back();
+								exp->pnextSubling = binaryop;
+								exp = new tokenNode("EXP",exp,NULL);
+								vec.push_back(exp);	
+							}
+
+	|	EXP BITOR EXP    	{
+								cout<<"deal with exp -> exp BITOR exp\n";
+								tokenNode* exp = vec.back();vec.pop_back();
+								tokenNode* binaryop = new tokenNode($2,NULL,exp);
+								exp = vec.back();vec.pop_back();
+								exp->pnextSubling = binaryop;
+								exp = new tokenNode("EXP",exp,NULL);
+								vec.push_back(exp);	
+							}
+
+	|	EXP BITAND EXP    	{
+								cout<<"deal with exp -> exp BITAND exp\n";
+								tokenNode* exp = vec.back();vec.pop_back();
+								tokenNode* binaryop = new tokenNode($2,NULL,exp);
+								exp = vec.back();vec.pop_back();
+								exp->pnextSubling = binaryop;
+								exp = new tokenNode("EXP",exp,NULL);
+								vec.push_back(exp);	
+							}
+
+	|	EXP LOGICALAND EXP  {
+								cout<<"deal with exp -> exp LOGICALAND exp\n";
+								tokenNode* exp = vec.back();vec.pop_back();
+								tokenNode* binaryop = new tokenNode($2,NULL,exp);
+								exp = vec.back();vec.pop_back();
+								exp->pnextSubling = binaryop;
+								exp = new tokenNode("EXP",exp,NULL);
+								vec.push_back(exp);		
+	                        }
+
+	|	EXP LOGICALOR EXP   {
+								cout<<"deal with exp -> exp LOGICALOR exp\n";
+								tokenNode* exp = vec.back();vec.pop_back();
+								tokenNode* binaryop = new tokenNode($2,NULL,exp);
+								exp = vec.back();vec.pop_back();
+								exp->pnextSubling = binaryop;
+								exp = new tokenNode("EXP",exp,NULL);
+								vec.push_back(exp);		
+	                        }
+
+	|	EXP BINASSIGNOP EXP    {
+								cout<<"deal with exp -> exp BINASSIGNOP exp\n";
+								tokenNode* exp = vec.back();vec.pop_back();
+								tokenNode* binaryop = new tokenNode($2,NULL,exp);
+								exp = vec.back();vec.pop_back();
 								exp->pnextSubling = binaryop;
 								exp = new tokenNode("EXP",exp,NULL);
 								vec.push_back(exp);		
