@@ -1,6 +1,4 @@
 int main()
 {
-	if (a){
-		p=ans[0]+a+1;
-	}
+	p=ab+cd+213;
 }

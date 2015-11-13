@@ -1,3 +1,4 @@
+%option yylineno
 %{
 
 #include <stdlib.h>
