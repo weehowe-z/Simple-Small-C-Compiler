@@ -830,7 +830,7 @@ int yyerror (const char *msg) {
 	printFlag = false;
 	fprintf(stderr, "YACC: %s at line %d\n", msg,yylineno);
 	fprintf(stderr, "YACC: does not expect %s\n",yytext);
-	fprintf(yyout, "YACC: %s at line %d\n", msg,yylineno);
-	fprintf(yyout, "YACC: does not expect %s\n",yytext);
+	//fprintf(yyout, "YACC: %s at line %d\n", msg,yylineno);
+	//fprintf(yyout, "YACC: does not expect %s\n",yytext);
 	return -1;
 }

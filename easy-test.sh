@@ -3,6 +3,7 @@
 # Created Time: Mon 02 Nov 2015 06:46:41 PM CST
 #########################################################################
 #!/bin/bash
+rm testcase-output/*;
 make clean;
 make;
 ./a.out testcase-input/arth/arth.sc  			  testcase-output/arth.out
