@@ -82,37 +82,6 @@ public:
 		root = rt;
 	}
 
-	void printWidth(FILE *fout)
-	{
-		getWidth();
-		tokenNode *p;
-		queue<tokenNode*> q;
-		queue<tokenNode*> tempQueue;
-		if (root != NULL) q.push(root);
-		while (!q.empty()){
-			p = q.front();
-			q.pop();
-			while (true){
-				fprintf(fout,"%d ", p->width);
-				if (p->pfirstChild != NULL) tempQueue.push(p->pfirstChild);
-				if (p->pnextSubling != NULL){
-					p = p->pnextSubling;
-				}
-				else{
-					break;
-				}
-			}
-			if (q.empty()){
-				fprintf(fout,"\n");
-				int tempSize = tempQueue.size();
-				for (int i = 0; i < tempSize;++i ){
-					q.push(tempQueue.front());
-					tempQueue.pop();
-				}
-			}
-		}		
-	}
-
 
 	int getWidthHelp(tokenNode* root)
 	{
@@ -150,6 +119,7 @@ public:
 			fprintf(fout,"%s", str.c_str());
 		}
 	}
+	
 	queue<string> getPrintString()
 	{
 		getWidth();

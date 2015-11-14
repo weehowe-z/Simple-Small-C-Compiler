@@ -7,3 +7,13 @@ A simplified compiler frontend, including a **lexical analyzer** and a **syntax 
 
 
 Using **Flex**, **Bison** and **LLVM**
+
+## Structure
+
+- lex.l       	Lexical Analyzer
+- parse.y     	Syntax Analyzer
+- node.h      	Handle with the token node and tree structures
+- makefile    	`make` to easy compile the compiler, and `make clean` to delete useless files
+- easy-test.sh 	shell script for easy test, test input is based on 7 given testcase
+
+
