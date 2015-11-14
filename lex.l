@@ -7,7 +7,9 @@
 /*Regular Definations*/
 DELIM		[ \t\n]
 DIGIT		[0-9]
+HEXLETTER	[0-9A-Fa-f]
 INT     	{DIGIT}+
+HEXINT		0[X|x]{HEXLETTER}+
 ID			({LETTER}|{UNDERSCORE})({LETTER}|{DIGIT}|{UNDERSCORE})*
 
 SEMI		[;]
@@ -75,6 +77,7 @@ int 			{yylval.charValue = strdup(yytext);return TYPE;}
 {RC}			{return RC;}
 
 {INT}			{yylval.intValue = atoi(yytext);return INT;}
+{HEXINT}		{yylval.charValue = strdup(yytext);return HEXINT;}
 {ID}			{yylval.charValue = strdup(yytext);return ID;}
 
 %%

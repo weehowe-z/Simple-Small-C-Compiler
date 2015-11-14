@@ -22,6 +22,7 @@ vector<tokenNode*> vec;
 };
 
 %token <intValue>INT    /*bind the yylval type*/
+%token <charValue>HEXINT
 %token <charValue>ID
 %token <charValue>UNARYOP
 %token <charValue>BINARYOP
@@ -215,12 +216,23 @@ VAR:
 										tokenNode* rb = new tokenNode("]");
 										tokenNode* integer = new tokenNode($3,NULL,rb);
 										tokenNode* lb = new tokenNode("[",NULL,integer);
-										tokenNode* var = vec.back();
-										vec.pop_back();
+										tokenNode* var = vec.back();vec.pop_back();
 										var->pnextSubling = lb;
 										var = new tokenNode("VAR",var,NULL);
 										vec.push_back(var);
 									}
+
+	|	VAR LB HEXINT RB			{
+										cout<<"deal with var -> var lb hexint rb\n";
+										tokenNode* rb = new tokenNode("]");
+										tokenNode* integer = new tokenNode($3,NULL,rb);
+										tokenNode* lb = new tokenNode("[",NULL,integer);
+										tokenNode* var = vec.back();vec.pop_back();
+										var->pnextSubling = lb;
+										var = new tokenNode("VAR",var,NULL);
+										vec.push_back(var);
+									}
+
 	;
 
 FUNC:
@@ -528,6 +540,7 @@ EXP:
 								exp = new tokenNode("EXP",exp,NULL);
 								vec.push_back(exp);								
 							}
+
 	|	INT                 {
 								cout<<"deal with exp -> int\n";
 								tokenNode* intVal = new tokenNode($1);
@@ -535,6 +548,15 @@ EXP:
 								tokenNode* exp = new tokenNode("EXP",intToken,NULL);
 								vec.push_back(exp);								
 							}
+
+	|	HEXINT                {
+								cout<<"deal with exp -> HEXint\n";
+								tokenNode* intVal = new tokenNode($1);
+								tokenNode* intToken = new tokenNode("INT",intVal,NULL);
+								tokenNode* exp = new tokenNode("EXP",intToken,NULL);
+								vec.push_back(exp);								
+							}
+
 	|	UNARYOP EXP         {
 								cout<<"deal with exp -> unaryop exp\n";
 								tokenNode* exp = vec.back();
