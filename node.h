@@ -2,6 +2,11 @@
 #include <string>
 #include <queue>
 #include <math.h>
+#include "llvm/IR/Value.h"
+
+
+class CodeGenContext;
+
 using namespace std;
 
 class tokenNode
@@ -13,6 +18,9 @@ public:
 	int pos;
 	tokenNode* pfirstChild;
 	tokenNode* pnextSubling;
+
+	llvm::Value* codeGen(CodeGenContext& context) { return NULL; }
+
 	tokenNode(string n = " ", tokenNode* pChild = NULL, tokenNode* pSubling = NULL)
 	{
 		name = n;

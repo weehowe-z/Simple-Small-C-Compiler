@@ -14,3 +14,4 @@ make;
 ./a.out testcase-input/queen/queen.sc             testcase-output/queen.out
 ./a.out testcase-input/struct/struct.sc           testcase-output/struct.out
 make clean;
+#clang-3.7 hello.c -S -emit-llvm
