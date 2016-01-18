@@ -30,6 +30,18 @@ void CodeGenContext::generateCode(NBlock& root)
 	pm.run(*module);
 }
 
+void CodeGenContext::saveByteCode(std::string path)
+{
+	std::cout << "Saving code...\n";
+	std::error_code EC;
+	llvm::raw_ostream *out = &outs();
+	out = new llvm::raw_fd_ostream(path, EC, sys::fs::F_None);
+	WriteBitcodeToFile(module, *out);
+	if (out != &outs()) delete out;
+}
+
+
+
 /* Executes the AST by running the main function */
 GenericValue CodeGenContext::runCode() {
 	std::cout << "Running code...\n";

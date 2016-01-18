@@ -13,10 +13,10 @@
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/Bitcode/ReaderWriter.h>
 #include <llvm/Support/TargetSelect.h>
+#include <llvm/Support/raw_ostream.h>
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
 #include <llvm/ExecutionEngine/MCJIT.h>
 #include <llvm/ExecutionEngine/GenericValue.h>
-#include <llvm/Support/raw_ostream.h>
 
 using namespace llvm;
 
@@ -38,6 +38,7 @@ public:
     CodeGenContext() { module = new Module("main", getGlobalContext()); }
     
     void generateCode(NBlock& root);
+    void saveByteCode(std::string path);
     GenericValue runCode();
     std::map<std::string, Value*>& locals() { return blocks.top()->locals; }
     BasicBlock *currentBlock() { return blocks.top()->block; }

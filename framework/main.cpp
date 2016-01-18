@@ -9,7 +9,7 @@ extern NBlock* programBlock;
 
 void createCoreFunctions(CodeGenContext& context);
 
-int main(int argc, char **argv)
+int main(int argc, char const *argv[])
 {
 	yyparse();
 	cout << programBlock << endl;
@@ -20,6 +20,7 @@ int main(int argc, char **argv)
 	CodeGenContext context;
 	createCoreFunctions(context);
 	context.generateCode(*programBlock);
+	context.saveByteCode("haha.bc");
 	context.runCode();
 	
 	return 0;
