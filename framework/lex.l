@@ -1,11 +1,11 @@
 %option yylineno
 %{
+#include <iostream>
 #include <string>
 #include "node.h"
 #include "parser.hpp"
 
 #define SAVE_TOKEN  yylval.string = new std::string(yytext, yyleng)
-#define TOKEN(t)    (yylval.token = t)
 %}
 
 %option noyywrap
@@ -48,7 +48,18 @@ BINASSIGNOP	\+=|-=|\*=|\/=|&=|\^=|\|=|<<=|>>=
 %%
 
 
-[ \t\n]					        ;
+{DELIM}			{/*Need no actions*/}
+[a-zA-Z_][a-zA-Z0-9_]*  SAVE_TOKEN; return TIDENTIFIER;
+[0-9]+\.[0-9]* 			    SAVE_TOKEN; return TDOUBLE;
+[0-9]+					        SAVE_TOKEN; return TINTEGER;
+
+
+{PLUS}  						{yylval.token = strdup(yytext);return PLUS;}
+
+
+%%
+/*.                       printf("Unknown token!\n"); yyterminate();*/
+/*
 "extern"                        return TOKEN(TEXTERN);
 "return"				        return TOKEN(TRETURN);
 [a-zA-Z_][a-zA-Z0-9_]*  SAVE_TOKEN; return TIDENTIFIER;
@@ -70,12 +81,10 @@ BINASSIGNOP	\+=|-=|\*=|\/=|&=|\^=|\|=|<<=|>>=
 
 "."         						return TOKEN(TDOT);
 ","				          		return TOKEN(TCOMMA);
+*/
 
-"+"				          		return TOKEN(TPLUS);
+/*
 "-"		          				return TOKEN(TMINUS);
-"*"		          				return TOKEN(TMUL);
+"*"		          				return TOKEN(TMINUS);
 "/"				          		return TOKEN(TDIV);
-
-
-%%
-/*.                       printf("Unknown token!\n"); yyterminate();*/
+*/

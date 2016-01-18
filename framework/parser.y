@@ -21,7 +21,7 @@
 	std::vector<NVariableDeclaration*> *varvec;
 	std::vector<NExpression*> *exprvec;
 	std::string *string;
-	int token;
+	char *token;
 }
 
 /* Define our terminal symbols (tokens). This should
@@ -33,6 +33,7 @@
 %token <token> TLPAREN TRPAREN TLBRACE TRBRACE TCOMMA TDOT
 %token <token> TPLUS TMINUS TMUL TDIV
 %token <token> TRETURN TEXTERN
+%token <token> PLUS
 
 /* Define the type of node our nonterminal symbols represent.
    The types refer to the %union declaration above. Ex: when
@@ -101,7 +102,7 @@ expr : ident TEQUAL expr { $$ = new NAssignment(*$<ident>1, *$3); }
 	 | numeric
          | expr TMUL expr { $$ = new NBinaryOperator(*$1, $2, *$3); }
          | expr TDIV expr { $$ = new NBinaryOperator(*$1, $2, *$3); }
-         | expr TPLUS expr { $$ = new NBinaryOperator(*$1, $2, *$3); }
+         | expr PLUS expr { $$ = new NBinaryOperator(*$1, $2, *$3);}
          | expr TMINUS expr { $$ = new NBinaryOperator(*$1, $2, *$3); }
  	 | expr comparison expr { $$ = new NBinaryOperator(*$1, $2, *$3); }
      | TLPAREN expr TRPAREN { $$ = $2; }

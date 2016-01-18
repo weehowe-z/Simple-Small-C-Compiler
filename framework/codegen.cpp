@@ -106,16 +106,30 @@ Value* NMethodCall::codeGen(CodeGenContext& context)
 
 Value* NBinaryOperator::codeGen(CodeGenContext& context)
 {
-	std::cout << "Creating binary operation " << op << endl;
+	std::cout << "Creating binary operation " << op_str << endl;
 	Instruction::BinaryOps instr;
-	switch (op) {
-		case TPLUS: 	instr = Instruction::Add; goto math;
-		case TMINUS: 	instr = Instruction::Sub; goto math;
-		case TMUL: 		instr = Instruction::Mul; goto math;
-		case TDIV: 		instr = Instruction::SDiv; goto math;
-				
-		/* TODO comparison */
+
+	if (op_str == "+"){
+		instr = Instruction::Add; goto math;
 	}
+	else if (op_str == "-"){
+		instr = Instruction::Sub; goto math;
+	}
+	else if (op_str == "*"){
+		instr = Instruction::Mul; goto math;
+	}
+	else if (op_str == "/"){
+		instr = Instruction::SDiv; goto math;
+	}
+
+	// switch (op) {
+	// 	case PLUS: 	instr = Instruction::Add; goto math;
+	// 	case TMINUS: 	instr = Instruction::Sub; goto math;
+	// 	case TMUL: 		instr = Instruction::Mul; goto math;
+	// 	case TDIV: 		instr = Instruction::SDiv; goto math;
+				
+	// 	/* TODO comparison */
+	// }
 
 	return NULL;
 math:

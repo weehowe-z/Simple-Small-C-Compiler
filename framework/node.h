@@ -56,11 +56,12 @@ public:
 
 class NBinaryOperator : public NExpression {
 public:
-	int op;
+	char* op;
+	std::string op_str;
 	NExpression& lhs;
 	NExpression& rhs;
-	NBinaryOperator(NExpression& lhs, int op, NExpression& rhs) :
-		lhs(lhs), rhs(rhs), op(op) { }
+	NBinaryOperator(NExpression& lhs, char* op, NExpression& rhs) :
+		lhs(lhs), rhs(rhs), op(op) { op_str = op; }
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
