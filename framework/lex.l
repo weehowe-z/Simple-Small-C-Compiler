@@ -1,3 +1,4 @@
+%option yylineno
 %{
 #include <string>
 #include "node.h"
@@ -9,7 +10,43 @@
 
 %option noyywrap
 
+/*Regular Definations*/
+DELIM		[ \t\n]
+DIGIT		[0-9]
+HEXLETTER	[0-9A-Fa-f]
+INT     	{DIGIT}+
+HEXINT		0[X|x]{HEXLETTER}+
+ID			({LETTER}|{UNDERSCORE})({LETTER}|{DIGIT}|{UNDERSCORE})*
+
+SEMI		[;]
+COMMA		[,]
+DOT			[.]
+UNDERSCORE	[_]
+LP			[(]
+RP			[)]
+LB			[[]
+RB			[]]
+LC			[{]
+RC			[}]
+LETTER		[A-Za-z]
+ASSIGNOP	[=]
+UNARYOP		!|\+\+|--|~
+BINARYOP	\*|\/|%
+MINUS		[-]
+PLUS		[\+]
+SHIFTOP		<<|>>
+COMPAREOP	>|>=|<|<=
+EQUALOP		==|!=
+BITAND		[&]
+BITXOR      [\^]
+BITOR       [\|]
+LOGICALAND  &&
+LOGICALOR	\|\|	
+BINASSIGNOP	\+=|-=|\*=|\/=|&=|\^=|\|=|<<=|>>=
+
+
 %%
+
 
 [ \t\n]					        ;
 "extern"                        return TOKEN(TEXTERN);
@@ -39,6 +76,6 @@
 "*"		          				return TOKEN(TMUL);
 "/"				          		return TOKEN(TDIV);
 
-.                       printf("Unknown token!\n"); yyterminate();
 
 %%
+/*.                       printf("Unknown token!\n"); yyterminate();*/

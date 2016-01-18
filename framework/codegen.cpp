@@ -7,7 +7,7 @@ using namespace std;
 /* Compile the AST into a module */
 void CodeGenContext::generateCode(NBlock& root)
 {
-	std::cout << "Generating code...\n";
+	std::cout << "\nGenerating code...\n";
 	
 	/* Create the top level interpreter function to call as entry */
 	vector<Type*> argTypes;
@@ -24,7 +24,7 @@ void CodeGenContext::generateCode(NBlock& root)
 	/* Print the bytecode in a human-readable format 
 	   to see if our program compiled properly
 	 */
-	std::cout << "Code is generated.\n";
+	std::cout << "\nCode is generated.\n";
 	PassManager<Module> pm;
 	pm.addPass(PrintModulePass(outs()));
 	pm.run(*module);
@@ -39,7 +39,6 @@ void CodeGenContext::saveByteCode(std::string path)
 	WriteBitcodeToFile(module, *out);
 	if (out != &outs()) delete out;
 }
-
 
 
 /* Executes the AST by running the main function */

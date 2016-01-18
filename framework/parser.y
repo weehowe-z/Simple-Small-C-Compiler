@@ -5,7 +5,9 @@
 	NBlock *programBlock; /* the top level root node of our final AST */
 
 	extern int yylex();
-	void yyerror(const char *s) { std::printf("Error: %s\n", s);std::exit(1); }
+	extern int yylineno;
+	extern char *yytext;
+	int yyerror (const char *msg);
 %}
 
 /* Represents the many different ways we can access our data */
@@ -113,3 +115,12 @@ call_args : /*blank*/  { $$ = new ExpressionList(); }
 comparison : TCEQ | TCNE | TCLT | TCLE | TCGT | TCGE;
 
 %%
+
+
+int yyerror (const char *msg) {
+	fprintf(stderr, "YACC: %s at line %d\n", msg,yylineno);
+	fprintf(stderr, "YACC: does not expect %s\n",yytext);
+	//fprintf(yyout, "YACC: %s at line %d\n", msg,yylineno);
+	//fprintf(yyout, "YACC: does not expect %s\n",yytext);
+	return -1;
+}
