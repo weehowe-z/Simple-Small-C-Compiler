@@ -11,6 +11,7 @@ int yyerror (const char *msg);
 std::vector<NExpression*> vec_temp_expr;
 std::vector<NStatement*> vec_temp_stmt;
 std::vector<NIdentifier*> vec_temp_ident;
+std::vector<Node*> vec;
 %}
 
 /* Represents the many different ways we can access our data */
@@ -111,46 +112,53 @@ std::vector<NIdentifier*> vec_temp_ident;
 
 PROGRAM:
 		EXTDEFS				{
+								std::cout<<"deal with PROGRAM -> extdefs\n";
+								Node* extdefs = vec.back();vec.pop_back();
+								Node* program = new Node("PROGRAM",extdefs,NULL);
 								programBlock = $1;
-								//cout<<"deal with PROGRAM -> extdefs\n";
-								// tokenNode* extdefs = vec.back();vec.pop_back();
-								// tokenNode* program = new tokenNode("PROGRAM",extdefs,NULL);
-								// pTree.changeRoot(program);
+
 							}
 	;
 
 EXTDEFS:
-		EXTDEF EXTDEFS		{
-								//cout<<"deal with extdefs -> extdef extdefs\n";
-								// tokenNode* extdefs = vec.back();
-								// vec.pop_back();
-								// tokenNode* extdef = vec.back();
-								// extdef->pnextSubling = extdefs;
-								// vec.pop_back();
-								// extdefs = new tokenNode("EXTDEFS",extdef,NULL);
-								// vec.push_back(extdefs);
+		EXTDEFS EXTDEF		{
+								std::cout<<"deal with extdefs -> extdef extdefs\n";
+								Node* extdefs = vec.back();
+								vec.pop_back();
+								Node* extdef = vec.back();
+								extdef->pnextSubling = extdefs;
+								vec.pop_back();
+								extdefs = new Node("EXTDEFS",extdef,NULL);
+								vec.push_back(extdefs);
 							}
 
 	|	/*EMPTY*/			{
-								//cout<<"deal with extdefs -> empty\n";
-								// tokenNode* empty = new tokenNode("ϵ");
-								// tokenNode* extdefs = new tokenNode("EXTDEFS",empty,NULL);
-								// vec.push_back(extdefs);
+								std::cout<<"deal with extdefs -> empty\n";
+								Node* empty = new Node("ϵ");
+								Node* extdefs = new Node("EXTDEFS",empty,NULL);
+								vec.push_back(extdefs);
 							}	
 	;
 
 EXTDEF:
 		SPEC EXTVARS SEMI   {
-								//cout<<"deal with extdef -> spec extvars semi\n";
-								// tokenNode* semi= new tokenNode(";");
-								// tokenNode* extvars = vec.back();
-								// vec.pop_back();
-								// tokenNode* spec = vec.back();
-								// vec.pop_back();
-								// extvars->pnextSubling = semi;
-								// spec->pnextSubling = extvars;
-								// tokenNode* extdef = new tokenNode("EXTDEF",spec,NULL);
-								// vec.push_back(extdef);
+								std::cout<<"deal with extdef -> spec extvars semi\n";
+								Node* semi= new Node(";");
+								Node* extvars = vec.back();vec.pop_back();
+								Node* spec = vec.back();vec.pop_back();
+								extvars->pnextSubling = semi;
+								spec->pnextSubling = extvars;
+								// Node* extdef = new Node("EXTDEF",spec,NULL);
+
+								Node* type = spec->pfirstChild;
+								Node* ID = extvars->pfirstChild->pfirstChild->pfirstChild;
+								std::cout<<type->node_name;
+								Node* extdef = new Node("EXTDEF",spec,NULL);
+								vec.push_back(extdef);
+
+								new NVariableDeclaration(*type, *ID);
+
+
 
 							}
 
@@ -168,11 +176,11 @@ EXTDEF:
 
 EXTVARS:
 		DEC             	{
-								//cout<<"deal with extvars -> dec\n";
-								// tokenNode* dec = vec.back();
-								// vec.pop_back();
-								// tokenNode* extvars = new tokenNode("EXTVARS",dec,NULL);
-								// vec.push_back(extvars);
+								std::cout<<"deal with extvars -> dec\n";
+								Node* dec = vec.back();
+								vec.pop_back();
+								Node* extvars = new Node("EXTVARS",dec,NULL);
+								vec.push_back(extvars);
 							}
 
 	|	DEC COMMA EXTVARS   {
@@ -200,7 +208,8 @@ SPEC:
 		TYPE            	{
 								std::cout<<"deal with spec -> type\n";
 								NIdentifier* type = new NIdentifier(*$1); delete $1;
-								vec_temp_ident.push_back(type);
+								Node* spec = new Node("SPEC",type,NULL);
+								vec.push_back(spec);
 								// tokenNode* typeVal = new tokenNode($1);
 								// tokenNode* type = new tokenNode("TYPE",typeVal,NULL);
 								// tokenNode* spec = new tokenNode("SPEC",type,NULL);
@@ -258,9 +267,12 @@ OPTTAG:
 
 VAR:
 		ID               			{
+
 										std::cout<<"deal with var -> id \n";
-										NIdentifier* ident = new NIdentifier(*$1); delete $1; 
-										vec_temp_ident.push_back(ident);
+										NIdentifier* id = new NIdentifier(*$1); delete $1; 
+										Node* var = new Node("VAR",id,NULL);
+										vec.push_back(var);
+
 										// tokenNode* idval= new tokenNode($1);
 										// tokenNode* id = new tokenNode("ID",idval,NULL);
 										// tokenNode* var = new tokenNode("VAR",id,NULL);
@@ -516,10 +528,10 @@ DECS:
 
 DEC:
 		VAR					{
-								//cout<<"deal with dec -> var\n";
-								// tokenNode* var = vec.back();vec.pop_back();
-								// tokenNode* dec = new tokenNode("DEC",var,NULL);
-								// vec.push_back(dec);
+								std::cout<<"deal with dec -> var\n";
+								Node* var = vec.back();vec.pop_back();
+								Node* dec = new Node("DEC",var,NULL);
+								vec.push_back(dec);
 							}	
 
 	|	VAR ASSIGNOP INIT	{

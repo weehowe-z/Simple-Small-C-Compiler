@@ -13,34 +13,53 @@ typedef std::vector<NVariableDeclaration*> VariableList;
 
 class Node {
 public:
+	std::string node_name;
+	int length;
+	int width;
+	int pos;
+	Node* pfirstChild;
+	Node* pnextSubling;
+	Node (std::string n = " ", Node* pChild = NULL, Node* pSubling = NULL)
+	{
+		node_name = n;
+		length = node_name.length();
+		if (node_name == "ϵ") length = 1; 
+		width = length;
+		pfirstChild = pChild;
+		pnextSubling = pSubling;
+	}
 	virtual ~Node() {}
 	virtual llvm::Value* codeGen(CodeGenContext& context) { return NULL; }
 };
 
 class NExpression : public Node {
+public:
+	NExpression(std::string n = " ", Node* pChild = NULL, Node* pSubling = NULL): Node(n,pChild,pSubling) {}
 };
 
 class NStatement : public Node {
+	public:
+	NStatement(std::string n = " ", Node* pChild = NULL, Node* pSubling = NULL): Node(n,pChild,pSubling) {}
 };
 
 class NInteger : public NExpression {
 public:
 	long long value;
-	NInteger(long long value) : value(value) { }
+	NInteger( long long value, std::string n = " ", Node* pChild = NULL, Node* pSubling = NULL) : NExpression(n,pChild,pSubling),value(value) { }
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
 class NDouble : public NExpression {
 public:
 	double value;
-	NDouble(double value) : value(value) { }
+	NDouble(double value, std::string n = " ", Node* pChild = NULL, Node* pSubling = NULL) : NExpression(n,pChild,pSubling),value(value) { }
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
 class NIdentifier : public NExpression {
 public:
 	std::string name;
-	NIdentifier(const std::string& name) : name(name) { }
+	NIdentifier(const std::string& name, std::string n = " ", Node* pChild = NULL, Node* pSubling = NULL) : NExpression(n,pChild,pSubling),name(name) { }
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
@@ -48,9 +67,10 @@ class NMethodCall : public NExpression {
 public:
 	const NIdentifier& id;
 	ExpressionList arguments;
-	NMethodCall(const NIdentifier& id, ExpressionList& arguments) :
-		id(id), arguments(arguments) { }
-	NMethodCall(const NIdentifier& id) : id(id) { }
+	NMethodCall(const NIdentifier& id, ExpressionList& arguments, std::string n = " ", Node* pChild = NULL, Node* pSubling = NULL) :
+		NExpression(n,pChild,pSubling),id(id), arguments(arguments) { }
+	NMethodCall(const NIdentifier& id, std::string n = " ", Node* pChild = NULL, Node* pSubling = NULL) : 
+		NExpression(n,pChild,pSubling),id(id) { }
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
@@ -60,8 +80,8 @@ public:
 	std::string op_str;
 	NExpression& lhs;
 	NExpression& rhs;
-	NBinaryOperator(NExpression& lhs, char* op, NExpression& rhs) :
-		lhs(lhs), rhs(rhs), op(op) { op_str = op; }
+	NBinaryOperator(NExpression& lhs, char* op, NExpression& rhs, std::string n = " ", Node* pChild = NULL, Node* pSubling = NULL) :
+		NExpression(n,pChild,pSubling),lhs(lhs), rhs(rhs), op(op) { op_str = op; }
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
@@ -69,10 +89,12 @@ class NAssignment : public NExpression {
 public:
 	NIdentifier& lhs;
 	NExpression& rhs;
-	NAssignment(NIdentifier& lhs, NExpression& rhs) : 
-		lhs(lhs), rhs(rhs) { }
+	NAssignment(NIdentifier& lhs, NExpression& rhs, std::string n = " ", Node* pChild = NULL, Node* pSubling = NULL) : 
+		NExpression(n,pChild,pSubling),lhs(lhs), rhs(rhs) { }
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
+
+///////////////////////////////////////////////////////////
 
 class NBlock : public NExpression {
 public:
