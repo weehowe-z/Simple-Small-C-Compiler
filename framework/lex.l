@@ -48,30 +48,46 @@ BINASSIGNOP	\+=|-=|\*=|\/=|&=|\^=|\|=|<<=|>>=
 %%
 
 
-{DELIM}							{/*Need no actions*/}
 
-{PLUS}  						{yylval.token = strdup(yytext);return PLUS;}
 
-{SEMI}							{return SEMI;}
-{COMMA}							{return COMMA;}
-{DOT}							{return DOT;}
-if          					{return IF;}
-then							{return THEN;}
-else							{return ELSE;}
-break							{return BREAK;}
-return							{return RETURN;}
-continue						{return CONT;}
-for         					{return FOR;}
-struct      					{return STRUCT;}
-{LP}							{return LP;}
-{RP}							{return RP;}
-{LB}							{return LB;}
-{RB}							{return RB;}
-{LC}							{return LC;}
-{RC}							{return RC;}
+{DELIM}			{/*Need no actions*/}
 
-{INT}					        {yylval.string = new std::string(yytext, yyleng); return TINTEGER;}
-{ID}  						 	{yylval.string = new std::string(yytext, yyleng); return TIDENTIFIER;}
+{UNARYOP}  		{yylval.token = strdup(yytext);return UNARYOP;}
+{BINARYOP}  	{yylval.token = strdup(yytext);return BINARYOP;}
+{MINUS}  		{yylval.token = strdup(yytext);return MINUS;}
+{PLUS}  		{yylval.token = strdup(yytext);return PLUS;}
+{SHIFTOP}  		{yylval.token = strdup(yytext);return SHIFTOP;}
+{COMPAREOP}  	{yylval.token = strdup(yytext);return COMPAREOP;}
+{EQUALOP}  		{yylval.token = strdup(yytext);return EQUALOP;}
+{BITAND}		{yylval.token = strdup(yytext);return BITAND;}
+{BITOR}			{yylval.token = strdup(yytext);return BITOR;}
+{BITXOR}		{yylval.token = strdup(yytext);return BITXOR;}
+{LOGICALAND}	{yylval.token = strdup(yytext);return LOGICALAND;}
+{LOGICALOR}		{yylval.token = strdup(yytext);return LOGICALOR;}
+{BINASSIGNOP}	{yylval.token = strdup(yytext);return BINASSIGNOP;}
+{ASSIGNOP}		{yylval.token = strdup(yytext);return ASSIGNOP;}
+
+{SEMI}			{return SEMI;}
+{COMMA}			{return COMMA;}
+{DOT}			{return DOT;}
+if          	{return IF;}
+then			{return THEN;}
+else			{return ELSE;}
+break			{return BREAK;}
+return			{return RETURN;}
+continue		{return CONT;}
+for         	{return FOR;}
+struct      	{return STRUCT;}
+{LP}			{return LP;}
+{RP}			{return RP;}
+{LB}			{return LB;}
+{RB}			{return RB;}
+{LC}			{return LC;}
+{RC}			{return RC;}
+int 			{yylval.string = new std::string(yytext, yyleng);return TYPE;}
+
+{INT}			{yylval.string = new std::string(yytext, yyleng); return INT;}
+{ID}  			{yylval.string = new std::string(yytext, yyleng); return ID;}
 
 %%
 

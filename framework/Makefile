@@ -29,6 +29,7 @@ lex.cpp: lex.l parser.hpp
 
 parser: $(OBJS)
 	g++ -o $@ $(OBJS) $(LIBS) $(LDFLAGS)
+#	rm *.o
 
 test: parser example.txt
 	cat example.txt | ./parser
