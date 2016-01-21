@@ -61,9 +61,16 @@ EXTDEFS:
 							}
 	;
 
-EXTDEF: TYPE EXTVARS SEMI { $$ = getNodeInstance(yylineno,"EXTDEF", "EXTDEF: TYPE EXTVARS ;", 2, getNodeInstance(yylineno,"TYPE", $1, 0),$2); }
-| STSPEC SEXTVARS SEMI { $$ = getNodeInstance(yylineno, "EXTDEF","EXTDEF: STSPEC SEXTVARS ;", 2, $1,$2); }
-| TYPE FUNC STMTBLOCK { $$ = getNodeInstance(yylineno,"EXTDEF", "EXTDEF: TYPE FUNC STMTBLOCK", 3, getNodeInstance(yylineno,"TYPE", $1, 0),$2,$3); }
+EXTDEF: 	TYPE EXTVARS SEMI 		{ 
+										$$ = getNodeInstance(yylineno,"EXTDEF", "EXTDEF: TYPE EXTVARS ;", 2, getNodeInstance(yylineno,"TYPE", $1, 0),$2);
+									}
+			
+    | 		STSPEC SEXTVARS SEMI 	{ 
+										$$ = getNodeInstance(yylineno, "EXTDEF","EXTDEF: STSPEC SEXTVARS ;", 2, $1,$2); 
+									}
+	| 		TYPE FUNC STMTBLOCK 	{
+										$$ = getNodeInstance(yylineno,"EXTDEF", "EXTDEF: TYPE FUNC STMTBLOCK", 3, getNodeInstance(yylineno,"TYPE", $1, 0),$2,$3); 
+									}
 ;
 
 //seperate struct

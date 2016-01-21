@@ -15,8 +15,8 @@ y.tab.o:y.tab.c header.h syntax_tree.h syntax_tree.cpp TreeNode.h TreeNode.cpp u
 y.tab.c y.tab.h:smallc.y header.h syntax_tree.h syntax_tree.cpp TreeNode.h TreeNode.cpp utility.h
 	$(YACC) smallc.y -v -d
 
-lex.yy.c:tokens.l header.h syntax_tree.h syntax_tree.cpp TreeNode.h TreeNode.cpp utility.h
-	$(LEX) tokens.l
+lex.yy.c:	lex.l
+	$(LEX) 	lex.l
 
 clean:
-	rm -f *.o *.c *.tab.h *.output *.err scc
+	rm -f *.o *.c *.tab.h *.output *.err *.ll scc NVM_RC_VERSION=
