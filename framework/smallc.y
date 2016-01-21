@@ -5,9 +5,10 @@
 #include "TreeNode.h"
 
 using namespace std;
-int yyerror(const char* msg);
-extern int yylineno;
 
+extern int yylineno;
+/*Solve warning: implicit declaration*/
+int yyerror(const char* msg);
 TreeNode * root;
 
 %}
@@ -44,11 +45,21 @@ TreeNode * root;
 %right <string> INC_OP DEC_OP UNARY 
 %left  DOT LP LB
 %%
-PROGRAM: EXTDEFS {root = $$ = getNodeInstance(yylineno,"PROGRAM","PROGRAM: EXTDEFS",1,$1);}
-;//done
-EXTDEFS: EXTDEF EXTDEFS {$$ = getNodeInstance(yylineno,"EXTDEFS","EXTDEFS: EXTDEF EXTDEFS",2,$1,$2);}
-| {$$ = getNodeInstance(yylineno,"EXTDEFS", "EXTDEFS:null", 0);}
-;//done
+PROGRAM:
+			EXTDEFS 		{
+								root = $$ = getNodeInstance(yylineno,"PROGRAM","PROGRAM: EXTDEFS",1,$1);
+							}
+	;
+
+EXTDEFS: 	
+			EXTDEF EXTDEFS 	{
+								$$ = getNodeInstance(yylineno,"EXTDEFS","EXTDEFS: EXTDEF EXTDEFS",2,$1,$2);
+							}
+
+	| 		/*EMPTY*/		{
+								$$ = getNodeInstance(yylineno,"EXTDEFS", "EXTDEFS:null", 0);
+							}
+	;
 
 EXTDEF: TYPE EXTVARS SEMI { $$ = getNodeInstance(yylineno,"EXTDEF", "EXTDEF: TYPE EXTVARS ;", 2, getNodeInstance(yylineno,"TYPE", $1, 0),$2); }
 | STSPEC SEXTVARS SEMI { $$ = getNodeInstance(yylineno, "EXTDEF","EXTDEF: STSPEC SEXTVARS ;", 2, $1,$2); }
@@ -194,12 +205,18 @@ UNARYOP:
 int yyerror(const char *msg)
 {
 	fflush(stdout);
-	fprintf(stderr,"yyerror: %d :%s %s\n",yylineno,msg,yytext);
+	fprintf(stderr, "Error: %s at line %d\n", msg,yylineno);
+	fprintf(stderr, "Parser does not expect '%s\n'",yytext);
 }
 
 
-int main(int argc, char *argv[])
+int main(int argc, char const *argv[])
 {
+	if (argc == 1){
+		fprintf(stderr, "\n%s\n", "Please write your code in the shell. Input <CTRL-D> to exit.");
+		fprintf(stderr, "%s\n", "Or you can specify the source code path. \nExample --> $./parser InputFile OutputFile\n");
+	}
+
 	freopen(argv[1], "r", stdin);
     	freopen(argv[2], "w", stdout);
 	if(!yyparse()){
