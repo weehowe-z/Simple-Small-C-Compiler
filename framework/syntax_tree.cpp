@@ -69,7 +69,6 @@ void TreeNode::freReg(string id) {
 
 void TreeNode::CodePrint() {
     init();
-    cerr<<"*********"<<endl;
     optimize=true;
     this->Codegen();
 
@@ -149,7 +148,6 @@ int TreeNode::SearchIdPointer(const string &id, string &MemPtr) const {
 
 
 int TreeNode::saveIdtoTable(const string & id,  const string & type, string & MemPtr) {
-    cerr<<"first layer:"<<id<<type<<endl;
     string n;
     return saveIdtoTable(id, type, n, MemPtr);
 }
@@ -161,7 +159,6 @@ int TreeNode::saveIdtoTable(const string & id, const string & type) {
 }
 
 int TreeNode::saveIdtoTable(const string & id, const string & type, const string & suffix, string &MemPtr) {
-    cerr<<"saving symbol:"<<id<<endl;
     TreeNode *treeNode = (TreeNode *) this;
     while (treeNode && treeNode->className != "STMTBLOCK" && treeNode->className != "PROGRAM") {
         treeNode = treeNode->parent;
@@ -191,13 +188,8 @@ void printTree(TreeNode *t, int level) {
     for (; i < level; i++) {
         printf("--");
     }
-    printf("%s", t->content.c_str());
-    printf("  (");
-    printf(" block_end_at_line:%d", t->lineCount);
-    printf(" children_num:%d", t->childrenSize);
-    printf(")\n");
-    i = 0;
-    for (; i < t->childrenSize; i++) {
+    printf("%s\n", t->content.c_str());
+    for (i = 0; i < t->childrenSize; i++) {
         printTree(t->children[i], level + 1);
     }
 }

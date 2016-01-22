@@ -1,11 +1,9 @@
 #include "Node.h"
 
 TreeNode *createNodeIns(int line, string type, string content, int childrenSize, ...) {
-    //cerr<<"requesting class "+className<<endl;
     TreeNode *p = ConstValue::get(type);
     p->className = type;
     p->lineCount = line;
-    //cerr<<content<<endl;
     p->content = content;
     p->childrenSize = childrenSize;
     p->children.resize(childrenSize);
@@ -25,8 +23,6 @@ TreeNode *createNodeIns(int line, string type, string content, int childrenSize,
 
 
 string PROGRAMTreeNode::Codegen() {
-    // addCode("@.str = private unnamed_addr constant [3 x i8] c\"%%d\\00\", align 1\n");
-    // addCode("@.str1 = private unnamed_addr constant [4 x i8] c\"%%d\\0A\\00\", align 1\n");
     addCode("@.str = private unnamed_addr constant [3 x i8] c\"%d\\00\", align 1\n");
     addCode("@.str1 = private unnamed_addr constant [4 x i8] c\"%d\\0A\\00\", align 1\n");
     for (auto c:children) {
@@ -41,19 +37,12 @@ string PROGRAMTreeNode::Codegen() {
     return "NULL";
 }
 
-//done
-string EXTDEFSTreeNode::Codegen() {//simply recursive
-    //1. EXTDEF EXTDEFS
-    //2. empty
-    cerr<<"entering extdefs"<<endl;
+string EXTDEFSTreeNode::Codegen() {
     return TreeNode::Codegen();
 }
 
-//done
 string EXTDEFTreeNode::Codegen() {
     smartEmit
-    // simply recursive
-    cerr<<"entering EXTDEF"<<endl;
     if (content == "EXTDEF: TYPE FUNC STMTBLOCK") {
         insideFunction = true;
         string ret = TreeNode::Codegen();
@@ -67,17 +56,7 @@ string EXTDEFTreeNode::Codegen() {
     return TreeNode::Codegen();
 }
 
-//done
 string EXTVARSTreeNode::Codegen() {
-    //4 case
-    //var is left value;
-    //********************
-    //var
-    //var, extvars
-    //var=init
-    //var=init, extvars
-    // empty
-    cerr<<"entering extvars:"<<content<<endl;
     if (children.size() <= 2) { //var//var,extvars
         TreeNode *t = children[0];
         if (t->content == "VAR: ID") {
@@ -223,13 +202,10 @@ string DECSTreeNode::Codegen() {
     return "NULL";
 }
 
-//done
 string INITTreeNode::Codegen() {
-    cerr << "init node should not be called!" << endl;
     return TreeNode::Codegen();
 }
 
-//done
 string ARGSTreeNode::Codegen() {
     string ret;
     getPointer = false;
@@ -256,11 +232,9 @@ string ARGSTreeNode::Codegen() {
 
 string FUNCTreeNode::Codegen() {
     EnableCodeGen = false;
-    //cerr<<"#############"<<children.at(1)->content<<endl;
     string list = children.at(1)->Codegen();
     EnableCodeGen = true;
 
-    //cerr<<"#############"<<list<<endl;
     addCode("define i32 @%s(" + list + ") #0")
     addReg(children.at(0)->content)
     return "NULL";
@@ -490,11 +464,9 @@ string EXPTreeNode::Codegen() {
 }
 
 string EXPSTreeNode::Codegen() {
-    cerr<<"exps:#"<<content<<"#"<<endl;
     const bool thisNodeGetPointer = getPointer;
     if (isdigit(content.back())) {
         //int
-        cerr<<"ret:"<<content<<endl;
         return content;
     } else if (content == "EXPS: ID ARRS") {
         if (children.at(1)->content == "ARRS: null") {
@@ -665,7 +637,6 @@ string EXPSTreeNode::Codegen() {
             return de;
         }
     } else if (children.size() == 2) { //binary case
-        cerr << "binary case:" << content << endl;
         string op1, op2, res;
         if (content == "=" || content == "+=" || content == "-=" || content == "/=" || content == "*=" ||
             content == "|=" || content == "&=" || content==">>=" || content =="<<=" || content== "^=") {
@@ -987,10 +958,8 @@ string INTTreeNode::Codegen() {
 }
 
 bool EXTDEFTreeNode::isEmit() {
-    cerr<<"############################"<<content<<endl;
     if(content=="EXTDEF: TYPE FUNC STMTBLOCK"){
         string functionName=children.at(1)->children.at(0)->content;
-        cerr<<"#################"<<functionName<<endl;
         if(usedFunctionName.count(functionName)==0 && functionName!="main"){
             err("not emiting funciton")
             return false;
@@ -1009,6 +978,5 @@ bool EXTDEFTreeNode::isEmit() {
             }
         }
     }
-    cerr<<"emit this node:"+content<<endl;
     return true;
 }

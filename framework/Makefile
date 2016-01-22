@@ -7,7 +7,7 @@ clean:
 	$(RM) *.o *.c *.tab.h *.output *.log *.ll scc NVM_RC_VERSION=
 
 scc: lex.yy.o y.tab.o header.h syntax_tree.h syntax_tree.cpp Node.h Node.cpp utility.h
-	$(CC) -o $@  $(CPPFLAGS) y.tab.c Node.cpp syntax_tree.cpp -g -ly -ll
+	$(CC) -o $@ $(CPPFLAGS) y.tab.c Node.cpp syntax_tree.cpp -g -ly -ll
 
 y.tab.c y.tab.h: parser.y
 	yacc parser.y -v -d
