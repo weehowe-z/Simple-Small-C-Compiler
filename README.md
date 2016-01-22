@@ -21,7 +21,7 @@ Using **Flex**, **Bison** and **LLVM**
 
 ## Usage
 
-### Quick test with testcase
+### 1.Quick test with testcase using scripts
 
 ```
 $ chmod +x quick-test.sh
@@ -29,19 +29,18 @@ $ ./quick-test.sh
 ```
 Detail of the shell script is:
 ```
-make;
-./scc testcase-input/arth/arth.sc  			  	testcase-output-IR/arth.ll
-./scc testcase-input/fib/fib.sc  				testcase-output-IR/fib.ll
-./scc testcase-input/gcd/gcd.sc                 testcase-output-IR/gcd.ll
-./scc testcase-input/io/io.sc          		  	testcase-output-IR/io.ll
-./scc testcase-input/if/if.sc                   testcase-output-IR/if.ll
-./scc testcase-input/queen/queen.sc             testcase-output-IR/queen.ll
-./scc testcase-input/struct/struct.sc           testcase-output-IR/struct.ll
-make clean;
+$ make;
+$ ./scc testcase-input/arth/arth.sc  			  	testcase-output-IR/arth.ll
+$ ./scc testcase-input/fib/fib.sc  				testcase-output-IR/fib.ll
+$ ./scc testcase-input/gcd/gcd.sc                 testcase-output-IR/gcd.ll
+$ ./scc testcase-input/io/io.sc          		  	testcase-output-IR/io.ll
+$ ./scc testcase-input/if/if.sc                   testcase-output-IR/if.ll
+$ ./scc testcase-input/queen/queen.sc             testcase-output-IR/queen.ll
+$ ./scc testcase-input/struct/struct.sc           testcase-output-IR/struct.ll
+$ make clean;
 ```
 
 All the testcase output will be saved at `testcase-output-IR`.
-
 Then you're free to use llvm runtime to excute IR codes. For example:
 ```
 $ lli arth.ll
@@ -51,7 +50,7 @@ $ lli arth.ll
 $ lli-3.5 arth.ll
 ```
  
-### Run test manually
+### 2.Run test manually
 
 ```
 $ make
@@ -59,18 +58,20 @@ $ make
 
 #### 1. Input from command line and output on command line
 ```
-$ ./a.out
+$ ./scc
 ```
+> You are required to input your code. And the output of IR code will be saved in file `NVM_RC_VERSION=`
 
 #### 2. Input from file and output on command line
 ```
-$ ./a.out   inputPath
+$ ./scc   inputPath
 ```
+> Output of IR code will be print in command line.
 
 #### 3. Input from file and output to file
 
 ```
-$ ./a.out   inputPath   outputPath
+$ ./scc   inputPath   outputPath
 ```
 
 ### Highlights
@@ -84,8 +85,8 @@ int mian(
 }
 
 Output
-YACC: syntax error at line 2
-YACC: does not expect }
+Error: syntax error at line 2
+Parser does not expect }
 ```
 
 #### 2. Clear Tree Structure Printing
