@@ -1,10 +1,7 @@
 #ifndef SYNTAX_TREE_H
 #define SYNTAX_TREE_H
 #include "header.h"
-#include "utility.h"
-
-#define err(x) \
-cerr<<"error at line"<<lineCount<<"; content: "<<content<<" #"<<(x)<<endl;
+#include "common.h"
 
 #define CHECK_RTN(y) \
 if (rtn!=0) { err(y) }
@@ -12,6 +9,8 @@ if (rtn!=0) { err(y) }
 #define CHECK_RTN_EXIT(y) \
 if(rtn!=0) { err(y) exit(-1);}
 
+#define err(x) \
+// cerr<<"error at line"<<lineCount<<"; content: "<<content<<" #"<<(x)<<endl;
 
 struct IdInfo{
     int lineno;

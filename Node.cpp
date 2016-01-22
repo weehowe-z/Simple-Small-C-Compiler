@@ -100,13 +100,13 @@ string EXTVARSTreeNode::Codegen() {
 
             addCode("%s  = common global [ " + t->children.at(1)->content + " x i32] [ " + list + " ], align 4\n");
             string memPtr;
-            cerr<<"117 @"<<content<<endl;
+            // cerr<<"117 @"<<content<<endl;
             string saveType="[ " + t->children.at(1)->content + " x i32]";
 
             rtn = saveIdtoTable(t->children.at(0)->content, saveType, memPtr);
             CHECK_RTN("error in saving to table");
             addReg(memPtr);
-            cerr<<"ending @"<<content<<endl;
+            // cerr<<"ending @"<<content<<endl;
         } else {
             err("Content not valid #"+t->content+"#"+r->content+"#");
         }
@@ -218,7 +218,7 @@ string ARGSTreeNode::Codegen() {
     if (isdigit(val.at(0)) || val.at(0) == '-') { // const
         ret = " i32 " + val + " ";
     } else {
-        cerr << " register must be i32, not checking."<<val<< endl;
+        // cerr << " register must be i32, not checking."<<val<< endl;
         ret = " i32 " + val + " ";
     }
 
@@ -375,7 +375,7 @@ string STMTTreeNode::Codegen() {
         if (children.size() > 2) {//else has somethingchildren.at(2
             addCode("%s:")
             addReg(labelelse)
-            cerr<<"Children size:"<<children.size()<<endl;
+            // cerr<<"Children size:"<<children.size()<<endl;
             children.at(2)->Codegen();
             addLabel(labelend);
         }else{
@@ -461,6 +461,31 @@ string EXPTreeNode::Codegen() {
         retType=children.at(0)->retType;
         return tmp;
     }
+}
+
+
+bool EXTDEFTreeNode::isEmit() {
+    if(content=="EXTDEF: TYPE FUNC STMTBLOCK"){
+        string functionName=children.at(1)->children.at(0)->content;
+        if(usedFunctionName.count(functionName)==0 && functionName!="main"){
+            err("not emiting funciton")
+            return false;
+        }
+    }else if(content=="EXTDEF: STSPEC SEXTVARS ;"){
+        if(children.at(0)->content=="STSPEC: STRUCT { SDEFS }"){
+            err("not emiting")
+            if(children.at(1)->children.size()==0){
+                return false;
+            }
+        }else{
+            string typeName="%"+children.at(0)->children.at(1)->content;
+            if(usedStructType.count(typeName)==0){
+                err("not emiting: "+typeName )
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 string EXPSTreeNode::Codegen() {
@@ -606,7 +631,7 @@ string EXPSTreeNode::Codegen() {
         if(structTypes.count(type)==0){
             err("symbol not found: " +type)
             for(auto a:structTypes){
-                cerr<<a<<endl;
+                // cerr<<a<<endl;
             }
             exit(-1);
         }
@@ -614,7 +639,7 @@ string EXPSTreeNode::Codegen() {
         if(structTable[type].count(at)==0){
             err("symbol in struct type:"+type+" does not has:" +at)
             for(auto a:structTable[type]){
-                cerr<<a.first<<endl;
+                // cerr<<a.first<<endl;
             }
             exit(-1);
         }
@@ -801,7 +826,7 @@ string EXPSTreeNode::Codegen() {
         }
 
     }
-    cerr<<"should not be here："<<content<<endl;
+    // cerr<<"should not be here："<<content<<endl;
     getPointer = thisNodeGetPointer;
     return "NULL";
 }
@@ -867,7 +892,7 @@ string STSPECTreeNode::Codegen() {
         if(structTypes.count(structType)==0){
             err("no such symbol struct :"+id)
             for(auto a:structTypes){
-                    cerr<<a<<endl;
+                    // cerr<<a<<endl;
             }
             exit(-1);
         }
@@ -957,26 +982,3 @@ string INTTreeNode::Codegen() {
     return ret;
 }
 
-bool EXTDEFTreeNode::isEmit() {
-    if(content=="EXTDEF: TYPE FUNC STMTBLOCK"){
-        string functionName=children.at(1)->children.at(0)->content;
-        if(usedFunctionName.count(functionName)==0 && functionName!="main"){
-            err("not emiting funciton")
-            return false;
-        }
-    }else if(content=="EXTDEF: STSPEC SEXTVARS ;"){
-        if(children.at(0)->content=="STSPEC: STRUCT { SDEFS }"){
-            err("not emiting")
-            if(children.at(1)->children.size()==0){
-                return false;
-            }
-        }else{
-            string typeName="%"+children.at(0)->children.at(1)->content;
-            if(usedStructType.count(typeName)==0){
-                err("not emiting: "+typeName )
-                return false;
-            }
-        }
-    }
-    return true;
-}
