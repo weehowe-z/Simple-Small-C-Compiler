@@ -189,7 +189,7 @@ TYPE  ID ( PARAS ) { DEFS STMTS }
  
  You may need `MonoDevelop` under Ubuntu or some other text editors to open the output, otherwise some text editors like `sublime text3` will automatically create a new line for wide output which may affect the beauty. Or 
 you can just input fewer codes to see the output.
-```
+
 
 ---
 
