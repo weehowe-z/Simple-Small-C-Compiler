@@ -885,7 +885,6 @@ string SDEFSTreeNode::Codegen() {
 };
 
 string STSPECTreeNode::Codegen() {
-    show();
     if(content=="STSPEC: STRUCT ID"){
         string id=children.at(1)->content;
         structType ="%"+id;

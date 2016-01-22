@@ -267,6 +267,7 @@ int main(int argc, char const *argv[])
 		if (!fin) { 
 			return fprintf (stderr, "Error: Input file %s does not exist!\n", argv[1]);
 		}
+		fprintf(stderr,"InputFile --> %s\n",argv[1]);
 	}
 	else if (argc == 3){
 		FILE* fin = freopen(argv[1], "r", stdin);
@@ -274,19 +275,30 @@ int main(int argc, char const *argv[])
 		if (!fin) { 
 			return fprintf (stderr, "Error: Input file %s does not exist!\n", argv[1]);
 		}
+		fprintf(stderr,"-------------------\n");
+		fprintf(stderr,"InputFile -> %s\n",argv[1]);
 	}
 	else {
 		return fprintf (stderr, "Error: Invalid parameter number!\n");
 	}
 
+	clock_t start,end;
+	double total_time_spent;
+
+	start = clock();
+
 	if(!yyparse()){
 		fprintf(stderr,"Parsing Complete!\n");
         root->CodePrint();
-        fprintf(stderr,"Translation Complete!\n\n");
+        fprintf(stderr,"Translation Complete!\n");
 	}
 	else{
-		fprintf(stderr, "Error: Parsing failed\n");
+		return fprintf(stderr, "Error: Parsing failed\n\n");
 	}
+
+	end = clock();
+	total_time_spent = (double)(end - start)* 1000 / CLOCKS_PER_SEC;
+	fprintf(stderr, "Total time spent: %.2fms\n\n",total_time_spent );
 
 	return 0;
 }
