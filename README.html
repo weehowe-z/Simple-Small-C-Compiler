@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hello!</title>
+<link rel="stylesheet" href="https://stackedit.io/res-min/themes/base.css" />
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+</head>
+<body><div class="container"><h1 id="simple-small-c-compiler">Simple Small C Compiler</h1>
+
+
+
+<h4 id="name-wenhao-zhu">Name: Wenhao Zhu</h4>
+
+
+
+<h4 id="student-id-5130309717">Student ID: 5130309717</h4>
+
+
+
+<h2 id="introduction">Introduction</h2>
+
+<p>A simplified compiler frontend, including a <strong>lexical analyzer</strong> and a <strong>syntax analyzer</strong>, for <code>Small-C</code>, which is a C-like language containing a subset of the C programming language. Besides, it also implements a <strong>code generator</strong> to translate the intermediate representation, which is produced by syntax analyzer, into <code>LLVM</code> instructions.</p>
+
+<p>Using <strong>Flex</strong>, <strong>Bison</strong> and <strong>LLVM</strong></p>
+
+
+
+<h2 id="structure">Structure</h2>
+
+<ul>
+<li><strong>lex.l</strong>         Lexical Analyzer</li>
+<li><strong>parser.y</strong>      Syntax Analyzer</li>
+<li><strong>Node.h</strong>        Node declaration</li>
+<li><strong>Node.cpp</strong>     Node implement</li>
+<li><strong>syntax_tree.h</strong> Tree structure and IR gen declaration</li>
+<li><strong>syntax_tree.cpp</strong> Tree structure and IR gen implement</li>
+<li><strong>Makefile</strong>      <code>make</code> to easy compile the compiler, and <code>make clean</code> to delete useless files</li>
+<li><strong>quick-test.sh</strong>     shell script for easy test, test input is based on 7 given testcases, output is llvm IR code in <code>testcase-output-IR</code></li>
+</ul>
+
+
+
+<h2 id="usage">Usage</h2>
+
+
+
+<h3 id="1quick-test-with-testcase-using-scripts">1.Quick test with testcase using scripts</h3>
+
+
+
+<pre class="prettyprint"><code class=" hljs ruby"><span class="hljs-variable">$ </span>chmod +x quick-test.sh
+<span class="hljs-variable">$ </span>./quick-test.sh</code></pre>
+
+<p>Detail of the shell script is:</p>
+
+
+
+<pre class="prettyprint"><code class=" hljs lasso">$ make;
+$ <span class="hljs-built_in">.</span>/scc testcase<span class="hljs-attribute">-input</span>/arth/arth<span class="hljs-built_in">.</span>sc                testcase<span class="hljs-attribute">-output</span><span class="hljs-attribute">-IR</span>/arth<span class="hljs-built_in">.</span>ll
+$ <span class="hljs-built_in">.</span>/scc testcase<span class="hljs-attribute">-input</span>/fib/fib<span class="hljs-built_in">.</span>sc                  testcase<span class="hljs-attribute">-output</span><span class="hljs-attribute">-IR</span>/fib<span class="hljs-built_in">.</span>ll
+$ <span class="hljs-built_in">.</span>/scc testcase<span class="hljs-attribute">-input</span>/gcd/gcd<span class="hljs-built_in">.</span>sc                 testcase<span class="hljs-attribute">-output</span><span class="hljs-attribute">-IR</span>/gcd<span class="hljs-built_in">.</span>ll
+$ <span class="hljs-built_in">.</span>/scc testcase<span class="hljs-attribute">-input</span>/io/io<span class="hljs-built_in">.</span>sc                    testcase<span class="hljs-attribute">-output</span><span class="hljs-attribute">-IR</span>/io<span class="hljs-built_in">.</span>ll
+$ <span class="hljs-built_in">.</span>/scc testcase<span class="hljs-attribute">-input</span>/<span class="hljs-keyword">if</span>/<span class="hljs-keyword">if</span><span class="hljs-built_in">.</span>sc                   testcase<span class="hljs-attribute">-output</span><span class="hljs-attribute">-IR</span>/<span class="hljs-keyword">if</span><span class="hljs-built_in">.</span>ll
+$ <span class="hljs-built_in">.</span>/scc testcase<span class="hljs-attribute">-input</span>/queen/queen<span class="hljs-built_in">.</span>sc             testcase<span class="hljs-attribute">-output</span><span class="hljs-attribute">-IR</span>/queen<span class="hljs-built_in">.</span>ll
+$ <span class="hljs-built_in">.</span>/scc testcase<span class="hljs-attribute">-input</span>/struct/struct<span class="hljs-built_in">.</span>sc           testcase<span class="hljs-attribute">-output</span><span class="hljs-attribute">-IR</span>/struct<span class="hljs-built_in">.</span>ll
+$ make clean;</code></pre>
+
+<p>All the testcase output will be saved at <code>testcase-output-IR</code>. <br>
+Then you’re free to use llvm runtime to excute IR codes. For example:</p>
+
+
+
+<pre class="prettyprint"><code class=" hljs ruby"><span class="hljs-variable">$ </span>lli arth.ll</code></pre>
+
+<p><strong>ATTENSION!!</strong>  As llvm IR syntax rules changes with version.  My code generation is based on <strong>llvm 3.5!!</strong>. I’ve test that <strong>llvm-3.7</strong> or higher does not support the current IR code. Thus,  you may need to run:</p>
+
+
+
+<pre class="prettyprint"><code class=" hljs ruby"><span class="hljs-variable">$ </span>lli-<span class="hljs-number">3.5</span> arth.ll</code></pre>
+
+
+
+<h3 id="2run-test-manually">2.Run test manually</h3>
+
+
+
+<pre class="prettyprint"><code class=" hljs ruby"><span class="hljs-variable">$ </span>make</code></pre>
+
+
+
+<h4 id="1-input-from-command-line-and-output-on-command-line">1. Input from command line and output on command line</h4>
+
+
+
+<pre class="prettyprint"><code class=" hljs ruby"><span class="hljs-variable">$ </span>./scc</code></pre>
+
+<blockquote>
+  <p>You are required to input your code. And the output of IR code will be will be print in command line and saved in file <code>NVM_RC_VERSION=</code></p>
+</blockquote>
+
+
+
+<h4 id="2-input-from-file-and-output-on-command-line">2. Input from file and output on command line</h4>
+
+
+
+<pre class="prettyprint"><code class=" hljs ruby"><span class="hljs-variable">$ </span>./scc   inputPath</code></pre>
+
+<blockquote>
+  <p>Output of IR code will be print in command line and saved in file <code>NVM_RC_VERSION=</code></p>
+</blockquote>
+
+
+
+<h4 id="3-input-from-file-and-output-to-file">3. Input from file and output to file</h4>
+
+
+
+<pre class="prettyprint"><code class=" hljs ruby"><span class="hljs-variable">$ </span>./scc   inputPath   outputPath</code></pre>
+
+
+
+<h3 id="highlights">Highlights</h3>
+
+
+
+<h4 id="1-syntax-error-handling">1. Syntax Error Handling</h4>
+
+<p>If there is a syntax error, the compiler will return which line and what input causes the error. <br>
+For example:</p>
+
+
+
+<pre class="prettyprint"><code class=" hljs vbscript">Input:
+<span class="hljs-built_in">int</span> mian(
+}
+
+Output
+<span class="hljs-keyword">Error</span>: syntax <span class="hljs-keyword">error</span> at line <span class="hljs-number">2</span>
+Parser does <span class="hljs-keyword">not</span> expect }</code></pre>
+
+
+
+<h4 id="2-semantic-error-handling">2. Semantic Error Handling</h4>
+
+<p>I have done some of the semantic error detection.</p>
+
+
+
+<h5 id="operand-type-checking"><strong>Operand type checking</strong></h5>
+
+<p>As operation like <code>dot</code> or <code>[]</code>, we will first checking whether the operation is valid for the object. For example,:</p>
+
+
+
+<pre class="prettyprint"><code class=" hljs applescript">Input:
+
+int main()
+{
+    int x;
+    x.<span class="hljs-keyword">get</span> = <span class="hljs-number">5</span>;
+<span class="hljs-command">    return</span> <span class="hljs-number">0</span>;
+}
+
+<span class="hljs-comment">---</span>
+Output:
+....
+Parsing Complete!
+Error: Semantic <span class="hljs-keyword">error</span> <span class="hljs-keyword">at</span> line <span class="hljs-number">4</span>
+Expected rules: EXPS: ID DOT ID
+only struct can  be used <span class="hljs-keyword">as</span> <span class="hljs-keyword">first</span> parameter <span class="hljs-keyword">of</span> Dot
+Exit</code></pre>
+
+
+
+<h5 id="declaration-checking"><strong>Declaration checking</strong></h5>
+
+<p>It maintain a symbol table the know whether the symbol has been declared. For example:</p>
+
+
+
+<pre class="prettyprint"><code class=" hljs vbscript">Input:
+
+<span class="hljs-built_in">int</span> main()
+{
+    return p;
+}
+
+---
+Output:
+....
+Parsing Complete!
+<span class="hljs-keyword">Error</span>: Semantic <span class="hljs-keyword">error</span> at line <span class="hljs-number">3</span>
+Expected rules: EXPS: ID ARRS
+<span class="hljs-keyword">not</span> found symbol:p
+<span class="hljs-keyword">Exit</span></code></pre>
+
+
+
+<h5 id="resevered-word-handling"><strong>Resevered word  handling</strong></h5>
+
+<p>This is implemented by the flex and yacc, as there are reserved words ,It will generate error during the building of the tree.</p>
+
+<h5 id="break-and-continue-checking"><strong>Break and continue checking</strong></h5>
+
+<p>Break and continue can only be used in a for-loop. A stack is used to maintain if program is inside a for loop, and each time there meets the token will first check the stack.  For example:</p>
+
+
+
+<pre class="prettyprint"><code class=" hljs lua">Input:
+
+int main()
+{
+    <span class="hljs-keyword">break</span>;
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+
+<span class="hljs-comment">---</span>
+Output:
+....
+Parsing Complete!
+Error: Semantic <span class="hljs-built_in">error</span> at line <span class="hljs-number">3</span>
+Expected rules: STMT: BREAK ;
+<span class="hljs-keyword">break</span> must be <span class="hljs-keyword">in</span> <span class="hljs-keyword">for</span> statement
+Exit</code></pre>
+
+
+
+<h4 id="3-code-optimization">3. Code Optimization</h4>
+
+<p>As there maintain a symbol table, for <strong>unused function declaration</strong>, the internal Tree Node will be directly removed for dead code elimination. As the same, <strong>unused struct declaration</strong> are also eliminated by removing the Node.</p>
+
+<h4 id="4-tree-structure-printing">4. Tree Structure Printing</h4>
+
+<p>As mentioned in project 1, I don’t use pre-order to print the parse tree. Instead, I use complicated functions to print a more distinct and clear tree structures for sake of beauty and more intuitive sense of the parse tree.</p>
+
+<p><strong>ATTENSION!!</strong>  As I print the parse tree in lines for beauty, like this:</p>
+
+<pre class="prettyprint"><code class=" hljs 1c">                  PROGRAM                  
+                     <span class="hljs-string">|</span>
+                     <span class="hljs-string">|</span>
+                  EXTDEFS                  
+                     <span class="hljs-string">|</span>
+                 <span class="hljs-string">|-------------------|</span>
+              EXTDEF              EXTDEFS 
+                 <span class="hljs-string">|                   |</span>
+  <span class="hljs-string">|---------|-------------|          </span>
+SPEC      FUNC        STMTBLOCK      ϵ 
+  <span class="hljs-string">|         |             |</span>
+  <span class="hljs-string">|    |-|---|---| |---|----|---|</span>
+TYPE  ID ( PARAS ) { DEFS STMTS } 
+  <span class="hljs-string">|    |     |         |    |</span>
+  <span class="hljs-string">|    |     |         |    |</span>
+ int main    ϵ         ϵ    ϵ 
+</code></pre>
+
+<p>Thus, the output parse is <strong>very wide</strong> when the input code is complex. </p>
+
+<p>You may need <code>MonoDevelop</code> under Ubuntu or some other text editors to open the output, otherwise some text editors like <code>sublime text3</code> will automatically create a new line for wide output which may affect the beauty. Or  <br>
+you can just input fewer codes to see the output.</p>
+
+
+
+<h4 id="5-timer">5. Timer</h4>
+
+<p>The compiler will get the total time for the procedure. You can analysis the efficiency with the clock time.</p>
+
+
+
+<pre class="prettyprint"><code class=" hljs r"><span class="hljs-keyword">...</span>
+-------------------
+InputFile -&gt; testcase-input/queen/queen.sc
+Parsing Complete!
+Translation Complete!
+Total time spent: <span class="hljs-number">2.</span>74ms
+
+-------------------
+InputFile -&gt; testcase-input/struct/struct.sc
+Parsing Complete!
+Translation Complete!
+Total time spent: <span class="hljs-number">1.</span>11ms
+<span class="hljs-keyword">...</span></code></pre>
+
+<hr>
+
+<h2 id="a-little-more-details">A Little More Details</h2>
+
+<p><img src="http://7xpne1.com1.z0.glb.clouddn.com/compiler-project-img-1.jpg" alt="compiler-project-img-1" title=""></p>
+
+<h3 id="lexical-analyzer">Lexical Analyzer</h3>
+
+<p>A lexical analyser has been implemented in this part. It reads the source codes of <strong>SMALLC</strong> and separates them into tokens. The work is done using <em>FLEX</em> and the related file is <code>"lex.l"</code></p>
+
+
+
+<h4 id="read-and-write">Read and Write</h4>
+
+<p>Since most of the details of <strong>TOKENS</strong> and <strong>Operators</strong> are given to us in the project requirement, I will not talk about them in the report. Instead, I will show you how to deal with <strong>read</strong> and <strong>write</strong> tokens. They are also very simple:</p>
+
+
+
+<pre class="prettyprint"><code class=" hljs livecodeserver"><span class="hljs-built_in">read</span>            { yylval.<span class="hljs-keyword">string</span> = strdup(yytext); <span class="hljs-constant">return</span> (READ);}
+<span class="hljs-built_in">write</span>           { yylval.<span class="hljs-keyword">string</span> = strdup(yytext); <span class="hljs-constant">return</span> (WRITE);}</code></pre>
+
+
+
+<h3 id="syntax-analyzer">Syntax Analyzer</h3>
+
+<p>In this step, I performed the syntax analysis using <em>YACC</em> and the file name is <code>"parser.y"</code>.</p>
+
+
+
+<h4 id="precedence-of-if-and-if-else-statement">Precedence of <em>IF</em> and <em>IF ELSE</em> Statement</h4>
+
+<p>There exists a conflict in the implementation of “<em>IF LP EXP RP STMT</em>” and “<em>IF LP EXP RP STMT ELSE STMT</em>“, and the former one should have a lower precedence than the latter one. Here is the implementation:</p>
+
+<pre><code>%nonassoc LOWER_THAN_ELSE
+%nonassoc ELSE
+%%
+STMT:
+ | IF LP EXP RP STMT %prec LOWER_THAN_ELSE
+ | IF LP EXP RP STMT ELSE STMT
+ ;
+</code></pre>
+
+
+
+<h4 id="error-message">Error Message</h4>
+
+<p>The error message is done together with generating the parse tree. Once an error occurs during the procedure, the parse process will shutdown and report the just-found mistake:</p>
+
+
+
+<pre class="prettyprint"><code class=" hljs vala"><span class="hljs-keyword">int</span> yyerror(<span class="hljs-keyword">const</span> <span class="hljs-keyword">char</span> *msg)
+{
+    fflush(<span class="hljs-keyword">stdout</span>);
+    fprintf(<span class="hljs-keyword">stderr</span>, <span class="hljs-string">"Error: %s at line %d\n"</span>, msg,yylineno);
+    fprintf(<span class="hljs-keyword">stderr</span>, <span class="hljs-string">"Parser does not expect '%s\n'"</span>,yytext);
+}</code></pre>
+
+<p>It will show you the line number of the error and its error text.</p>
+
+
+
+<h3 id="semantic-analyzer-ir-generation">Semantic Analyzer &amp; IR Generation</h3>
+
+<p>In this section, I have implemented the Semantic Analyzer &amp; IR Generation together with the formation of the parse tree.</p>
+
+
+
+<h4 id="tree-generation">Tree Generation</h4>
+
+<p>The Parse Tree Generation is based on the construction of different kinds of Node and implements its <code>codegen</code> function. For example, some of the different variables of <em>Node</em> and there usage are shown in the table below:</p>
+
+<table>
+    <tbody><tr>
+        <td><b>Contained By</b></td>
+        <td><b>Variable Name</b></td>
+        <td><b>Usage</b></td>
+    </tr>
+    <tr>
+        <td><b>All</b></td>
+        <td>int mi_LineNum</td>
+        <td>Line Number, used by error message</td>
+    </tr>
+    <tr>
+        <td></td>
+        <td>NodeType</td>
+        <td>Type of the node, e.g. Expression, Statement, Declaration</td>
+    </tr>
+    <tr>
+        <td></td>
+        <td>Name</td>
+        <td>Different uses in different variables, e.g. function name</td>
+    </tr>
+    <tr>
+        <td><b>Expression</b></td>
+        <td>ExpressionType</td>
+        <td>The type of expression, e.g. binary_operator</td>
+    </tr>
+    <tr>
+        <td></td>
+        <td>bool ValueExpression</td>
+        <td>Whether it is an L-Value Expression</td>
+    </tr>
+        <tr>
+        <td>…</td>
+        <td>…</td>
+        <td>…</td>
+    </tr>
+</tbody></table>
+
+
+
+<h4 id="register-allocation">Register Allocation</h4>
+
+<p>According some reference book, the algorithm is shown below, a little bit like <strong>FIFO</strong>: <br>
+1. Maintain a set <code>freeRgSet</code>for free registers .  <br>
+2. whenever <code>regFree</code> is called, then the specific register will be add to  <code>freeRgSet</code> <br>
+3. whenever <code>regAllocate</code> is called, then return the first element of <code>freeRgSet</code>. If there are no valid reg then return a newly created name.</p>
+
+<h4 id="intermediate-representation">Intermediate Representation</h4>
+
+<p>These are all related to llvm documents. And implements through code-gen functions in all inherits of Node class.</p>
+
+<table>
+    <tbody><tr>
+        <td><b>Small C</b></td>
+        <td><b>LLVM IR</b></td>
+    </tr>
+    <tr>
+    </tr><tr>
+        <td>read</td>
+        <td>%s = call i32 (i8*, …)* @__isoc99_scanf(i8* 
+getelementptr inbounds ([3 x i8]* @.str, i32 0, i32 
+0), i32* %s) </td>
+    </tr>
+    <tr>
+        <td>write</td>
+        <td>%s = call i32 (i8*, …)* @__isoc99_scanf(i8* 
+getelementptr inbounds ([3 x i8]* @.str, i32 0, i32 
+0), i32* %s) </td>
+    </tr>   
+    <tr>
+        <td>continue, break</td>
+        <td>br label %%%s </td>
+    </tr>    
+    <tr>
+        <td>return </td>
+        <td>ret i32 %s </td>
+    </tr>
+    <tr>
+        <td>…. </td>
+        <td>…. </td>
+    </tr>
+</tbody></table>
+
+<h2 id="other">Other</h2>
+
+<p><strong>All related information can be also found on my <a href="https://github.com/weehowe-z/Simple-Small-C-Compiler">github</a>.</strong></p>
+
+<p><strong>Any problem happens to my code(can’t run.. etc), plz contact me at <a href="mailto:weehowe.z@gmail.com">weehowe.z@gmail.com</a></strong></p>
+
+<p>请用 <strong>lli-3.5</strong> 执行IR代码, 有问题的话, 可以联系我远程演示= =</p></div></body>
+</html>
