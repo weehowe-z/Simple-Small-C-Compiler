@@ -2,7 +2,7 @@
 #include "header.h"
 #include "lex.yy.c"
 #include "syntax_tree.h"
-#include "TreeNode.h"
+#include "Node.h"
 
 using namespace std;
 

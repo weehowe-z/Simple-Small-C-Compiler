@@ -1,4 +1,4 @@
-#include "TreeNode.h"
+#include "Node.h"
 
 TreeNode *getNodeInstance(int line, string type, string content, int childrenSize, ...) {
     //cerr<<"requesting class "+className<<endl;

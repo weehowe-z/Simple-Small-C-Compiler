@@ -1,9 +1,5 @@
-//
-// Created by jiadongyu on 1/12/16.
-//
-
-#ifndef INC_5120309607_PRJ2_TREENODE_H
-#define INC_5120309607_PRJ2_TREENODE_H
+#ifndef TreeNode_H
+#define TreeNode_H
 #include "syntax_tree.h"
 #define GenNode(x) \
 class x##TreeNode: public TreeNode{ \
@@ -23,8 +19,6 @@ if(y.size()>0 && y.at(0)!='-' && isdigit(y.at(0)) ){\
 cover.dependency[x].insert(y); \
 cover.affectedVar.insert(x); \
 }
-
-
 
 
 GenNode(PROGRAM);
@@ -52,7 +46,6 @@ GenNode(EXP);
 GenNode(EXPS);
 GenNode(ARRS);
 GenNode(INT);
-
 
 
 class ARGSTreeNode: public TreeNode{
@@ -95,5 +88,5 @@ public:
 
 TreeNode* getNodeInstance(int line,string type, string content, int childrenSize, ...);
 
-#endif //INC_5120309607_PRJ2_TREENODE_H
+#endif
 
