@@ -10,7 +10,7 @@ if (rtn!=0) { err(y) }
 if(rtn!=0) { err(y) exit(-1);}
 
 #define err(x) \
-// cerr<<"error at line"<<lineCount<<"; content: "<<content<<" #"<<(x)<<endl;
+cerr<<"Error: Semantic error at line "<<lineCount<<"\tExpected rules: "<<content<<"\n"<<(x)<<endl<<"Exit\n";
 
 struct IdInfo{
     int lineno;
@@ -130,6 +130,8 @@ public:
         cerr<<"className:"<<className<<endl;
         cerr<<"children size:"<<children.size()<<endl;
     }
+
+
 
 
 public:// symbolTable
