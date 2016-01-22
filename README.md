@@ -183,7 +183,8 @@ TYPE  ID ( PARAS ) { DEFS STMTS }
   |    |     |         |    |
   |    |     |         |    |
  int main    ϵ         ϵ    ϵ 
- ```
+ 
+```
  
  Thus, the output parse is **very wide** when the input code is complex. 
  
@@ -204,7 +205,7 @@ read 			{ yylval.string = strdup(yytext); return (READ);}
 write 		    { yylval.string = strdup(yytext); return (WRITE);}
 ```
 ###Syntax Analyzer
-In this step, I performed the syntax analysis using *YACC* and the file name is `"smallc.y"`.
+In this step, I performed the syntax analysis using *YACC* and the file name is `"parser.y"`.
 ####Precedence of *IF* and *IF ELSE* Statement
 There exists a conflict in the implementation of "*IF LP EXP RP STMT*" and "*IF LP EXP RP STMT ELSE STMT*", and the former one should have a lower precedence than the latter one. Here is the implementation:
 
@@ -228,6 +229,51 @@ int yyerror(const char *msg)
 ```
 
 It will show you the line number of the error and its error text.
+
+###Semantic Analyzer & IR Generation
+In this section, I have implemented the Semantic Analyzer & IR Generation together with the formation of the parse tree.
+####Parse Tree Generation
+Actually, the *Parse Tree Generation* part is done in the above section. Since it is closely related to *Semantic Analyzing* as well as *IR Generation*, I will talk about it in this section.
+
+The Parse Tree Generation is based on the construction of different kinds of Node and implements its `codegen` function. For example, some of the different variables of *Node* and there usage are shown in the table below:
+
+<table>
+	<tr>
+		<td><B>Contained By</B></td>
+		<td><B>Variable Name</B></td>
+		<td><B>Usage</B></td>
+	</tr>
+	<tr>
+		<td><B>All</B></td>
+		<td>int mi_LineNum</td>
+		<td>Line Number, used by error message</td>
+	</tr>
+	<tr>
+		<td></td>
+		<td>NodeType</td>
+		<td>Type of the node, e.g. Expression, Statement, Declaration</td>
+	</tr>
+	<tr>
+		<td></td>
+		<td>Name</td>
+		<td>Different uses in different variables, e.g. function name</td>
+	</tr>
+	<tr>
+		<td><B>Expression</B></td>
+		<td>ExpressionType</td>
+		<td>The type of expression, e.g. binary_operator</td>
+	</tr>
+	<tr>
+		<td></td>
+		<td>bool ValueExpression</td>
+		<td>Whether it is an L-Value Expression</td>
+	</tr>
+		<tr>
+		<td>...</td>
+		<td>...</td>
+		<td>...</td>
+	</tr>
+</table>
 
 
 ## Other
