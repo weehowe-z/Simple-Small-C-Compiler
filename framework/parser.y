@@ -26,9 +26,11 @@ TreeNode * root;
 %token <string> INT ID SEMI COMMA
 %token <string> TYPE LP RP LB RB LC RC STRUCT RETURN
 %token <string> IF ELSE BREAK CONT FOR DOT ASSIGN
+
 %type <node> PROGRAM EXTDEFS EXTDEF SEXTVARS EXTVARS STSPEC FUNC PARAS STMTBLOCK STMTS
 %type <node> STMT DEFS SDEFS SDECS DECS VAR INIT EXP EXPS ARRS ARGS UNARYOP
 
+/*Precedence Declaration*/
 %nonassoc  IF_NO_ELSE
 %nonassoc ELSE_AFTER_IF
 %right ASSIGN ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN AND_ASSIGN MOD_ASSIGN XOR_ASSIGN OR_ASSIGN LEFT_ASSIGN RIGHT_ASSIGN
@@ -44,6 +46,9 @@ TreeNode * root;
 %left <string> PRODUCT_OP DIV_OP MOD_OP
 %right <string> INC_OP DEC_OP UNARY 
 %left  DOT LP LB
+
+%start PROGRAM
+
 %%
 PROGRAM:
 			EXTDEFS 		{
@@ -71,24 +76,50 @@ EXTDEF: 	TYPE EXTVARS SEMI 		{
 	| 		TYPE FUNC STMTBLOCK 	{
 										$$ = getNodeInstance(yylineno,"EXTDEF", "EXTDEF: TYPE FUNC STMTBLOCK", 3, getNodeInstance(yylineno,"TYPE", $1, 0),$2,$3); 
 									}
-;
+	;
 
-//seperate struct
-SEXTVARS: ID { $$ = getNodeInstance(yylineno,"SEXTVARS", "SEXTVARS: ID",1,getNodeInstance(yylineno,"ID",$1,0)); }
-| ID COMMA SEXTVARS { $$ = getNodeInstance(yylineno, "SEXTVARS", "SEXTVARS: ID , SEXTVARS", 2, getNodeInstance(yylineno,"ID", $1, 0),$3); }
-| {$$ = getNodeInstance(yylineno,"SEXTVARS", "SEXTVARS: null", 0);}
-;//jump
 
-EXTVARS: VAR { $$ = getNodeInstance(yylineno,"EXTVARS", "EXTVARS: VAR", 1, $1); }
-|VAR COMMA EXTVARS { $$ = getNodeInstance(yylineno,"EXTVARS", "EXTVARS:VAR , EXTVARS", 2, $1,$3); }
-|VAR ASSIGN INIT { $$ = getNodeInstance(yylineno,"EXTVARS", "EXTVARS:VAR ASSIGN INIT", 3, $1,getNodeInstance(yylineno,"ASSIGN",$2,0),$3); }
-|VAR ASSIGN INIT COMMA EXTVARS { $$ = getNodeInstance(yylineno,"EXTVARS", "EXTVARS:VAR ASSIGN INIT , EXTVARS", 4, $1,getNodeInstance(yylineno,"ASSIGN",$2,0),$3,$5); }
-| {$$ = getNodeInstance(yylineno,"EXTVARS", "EXTVARS:null", 0);}
-;
+SEXTVARS: 	ID 						{ 
+										$$ = getNodeInstance(yylineno,"SEXTVARS", "SEXTVARS: ID",1,getNodeInstance(yylineno,"ID",$1,0));
+									}
+	| 		ID COMMA SEXTVARS 		{ 	
+										$$ = getNodeInstance(yylineno, "SEXTVARS", "SEXTVARS: ID , SEXTVARS", 2, getNodeInstance(yylineno,"ID", $1, 0),$3);
+									}
+	|		/*EMPTY*/				{
+										$$ = getNodeInstance(yylineno,"SEXTVARS", "SEXTVARS: null", 0);
+									}
+	;
 
-STSPEC: STRUCT ID LC SDEFS RC { $$ = getNodeInstance(yylineno,"STSPEC", "STSPEC: STRUCT ID { SDEFS }", 3, getNodeInstance(yylineno,"STRUCT",$1,0),getNodeInstance(yylineno,"ID", $2, 0),$4); }
-| STRUCT LC SDEFS RC { $$ = getNodeInstance(yylineno, "STSPEC","STSPEC: STRUCT { SDEFS }", 2, getNodeInstance(yylineno,"STRUCT",$1,0),$3); }
-| STRUCT ID { $$ = getNodeInstance(yylineno, "STSPEC","STSPEC: STRUCT ID", 2, getNodeInstance(yylineno,"STRUCT",$1,0),getNodeInstance(yylineno,"ID", $2, 0)); }
+EXTVARS: 	VAR 						{ 	
+											$$ = getNodeInstance(yylineno,"EXTVARS", "EXTVARS: VAR", 1, $1);
+										}
+
+	|		VAR COMMA EXTVARS 			{	
+											$$ = getNodeInstance(yylineno,"EXTVARS", "EXTVARS:VAR , EXTVARS", 2, $1,$3);
+										}
+
+	|		VAR ASSIGN INIT 			{
+											$$ = getNodeInstance(yylineno,"EXTVARS", "EXTVARS:VAR ASSIGN INIT", 3, $1,getNodeInstance(yylineno,"ASSIGN",$2,0),$3); 
+										}
+	|		VAR ASSIGN INIT COMMA EXTVARS	{ 
+												$$ = getNodeInstance(yylineno,"EXTVARS", "EXTVARS:VAR ASSIGN INIT , EXTVARS", 4, $1,getNodeInstance(yylineno,"ASSIGN",$2,0),$3,$5);
+											}
+	| 		/*EMPTY*/					{
+											$$ = getNodeInstance(yylineno,"EXTVARS", "EXTVARS:null", 0);
+										}
+	;
+
+STSPEC: 	STRUCT ID LC SDEFS RC 		{
+											$$ = getNodeInstance(yylineno,"STSPEC", "STSPEC: STRUCT ID { SDEFS }", 3, getNodeInstance(yylineno,"STRUCT",$1,0),getNodeInstance(yylineno,"ID", $2, 0),$4);
+										}
+
+	| 		STRUCT LC SDEFS RC 			{ 	
+											$$ = getNodeInstance(yylineno, "STSPEC","STSPEC: STRUCT { SDEFS }", 2, getNodeInstance(yylineno,"STRUCT",$1,0),$3); 
+										}
+
+	| 		STRUCT ID 					{ 	
+											$$ = getNodeInstance(yylineno, "STSPEC","STSPEC: STRUCT ID", 2, getNodeInstance(yylineno,"STRUCT",$1,0),getNodeInstance(yylineno,"ID", $2, 0));
+										}
 ;
 
 FUNC: ID LP PARAS RP { $$ = getNodeInstance(yylineno, "FUNC","FUNC: ID ( PARAS )", 2, getNodeInstance(yylineno,"ID" ,$1, 0),$3); }
@@ -238,6 +269,7 @@ int main(int argc, char const *argv[])
 
 	return 0;
 }
+
 int yywrap()
 {
 	return 1;
