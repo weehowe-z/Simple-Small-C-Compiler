@@ -194,7 +194,7 @@ you can just input fewer codes to see the output.
 
 ---
 
-## Details
+## A Little More Details
 
 ###Lexical Analyzer
 A lexical analyser has been implemented in this part. It reads the source codes of **SMALLC** and separates them into tokens. The work is done using *FLEX* and the related file is `"lex.l"`
@@ -232,9 +232,7 @@ It will show you the line number of the error and its error text.
 
 ###Semantic Analyzer & IR Generation
 In this section, I have implemented the Semantic Analyzer & IR Generation together with the formation of the parse tree.
-####Parse Tree Generation
-Actually, the *Parse Tree Generation* part is done in the above section. Since it is closely related to *Semantic Analyzing* as well as *IR Generation*, I will talk about it in this section.
-
+####Tree Generation
 The Parse Tree Generation is based on the construction of different kinds of Node and implements its `codegen` function. For example, some of the different variables of *Node* and there usage are shown in the table below:
 
 <table>
@@ -274,8 +272,39 @@ The Parse Tree Generation is based on the construction of different kinds of Nod
 		<td>...</td>
 	</tr>
 </table>
-
-
+####Intermediate Representation 
+These are all related to llvm documents.
+<table>
+	<tr>
+		<td><B>Small C</B></td>
+		<td><B>LLVM IR</B></td>
+	</tr>
+	<tr>
+	<tr>
+		<td>read</td>
+		<td>%s = call i32 (i8*, ...)* @__isoc99_scanf(i8* 
+getelementptr inbounds ([3 x i8]* @.str, i32 0, i32 
+0), i32* %s) </td>
+	</tr>
+	<tr>
+		<td>write</td>
+		<td>%s = call i32 (i8*, ...)* @__isoc99_scanf(i8* 
+getelementptr inbounds ([3 x i8]* @.str, i32 0, i32 
+0), i32* %s) </td>
+	</tr>	
+	<tr>
+		<td>continue, break</td>
+		<td>br label %%%s </td>
+	</tr>	 
+	<tr>
+		<td>return </td>
+		<td>ret i32 %s </td>
+	</tr>
+	<tr>
+		<td>.... </td>
+		<td>.... </td>
+	</tr>
+</table>
 ## Other
 
 **All related information can be also found on my [github](https://github.com/weehowe-z/Simple-Small-C-Compiler).**
