@@ -60,13 +60,13 @@ $ make
 ```
 $ ./scc
 ```
-> You are required to input your code. And the output of IR code will be saved in file `NVM_RC_VERSION=`
+> You are required to input your code. And the output of IR code will be will be print in command line and saved in file `NVM_RC_VERSION=`
 
 #### 2. Input from file and output on command line
 ```
 $ ./scc   inputPath
 ```
-> Output of IR code will be print in command line.
+> Output of IR code will be print in command line and saved in file `NVM_RC_VERSION=`
 
 #### 3. Input from file and output to file
 
@@ -76,7 +76,7 @@ $ ./scc   inputPath   outputPath
 
 ### Highlights
 
-#### 1. Error Handling
+#### 1. Syntax Error Handling
 If there is a syntax error, the compiler will return which line and what input causes the error.
 For example:
 ```
@@ -88,6 +88,32 @@ Output
 Error: syntax error at line 2
 Parser does not expect }
 ```
+#### 2. Semantic Error Handling
+I have done some of the semantic error detection.
+##### Operand type checking
+As operation like `dot` or `[]`, we will first checking whether the operation is valid for the object. For example,:
+```
+Input:
+
+int main()
+{
+	int x;
+	x.get = 5;
+	return 0;
+}
+
+---
+Output:
+....
+Parsing Complete!
+Error: Semantic error at line 4
+Expected rules: EXPS: ID DOT ID
+only struct can  be used as first parameter of Dot
+```
+
+
+
+
 
 #### 2. Clear Tree Structure Printing
 As mentioned above, I don't use preorder to print the parse tree. Instead, I use complicated functions to print a more distinct and clear tree structures for sake of beauty and more intuitive sense of the parse tree.
