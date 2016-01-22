@@ -262,17 +262,30 @@ int main(int argc, char const *argv[])
 		fprintf(stderr, "\n%s\n", "Please write your code in the shell. Input <CTRL-D> to exit.");
 		fprintf(stderr, "%s\n", "Or you can specify the source code path. \nExample --> $./parser InputFile OutputFile\n");
 	}
+	else if (argc == 2){
+		FILE* fin = freopen(argv[1], "r", stdin);
+		if (!fin) { 
+			return fprintf (stderr, "Error: Input file %s does not exist!\n", argv[1]);
+		}
+	}
+	else if (argc == 3){
+		FILE* fin = freopen(argv[1], "r", stdin);
+		FILE* fout = freopen(argv[2], "w", stdout);
+		if (!fin) { 
+			return fprintf (stderr, "Error: Input file %s does not exist!\n", argv[1]);
+		}
+	}
+	else {
+		return fprintf (stderr, "Error: Invalid parameter number!\n");
+	}
 
-	freopen(argv[1], "r", stdin);
-    	freopen(argv[2], "w", stdout);
 	if(!yyparse()){
-		fprintf(stderr,"Parsing complete.\n");
-		//printTree(root,0);
+		fprintf(stderr,"Parsing Complete!\n");
         root->CodePrint();
-        fprintf(stderr,"Translation success\n\n\n");
+        fprintf(stderr,"Translation Complete!\n\n");
 	}
 	else{
-		printf("ERROR! parse failed.\n");
+		fprintf(stderr, "Error: Parsing failed\n");
 	}
 
 	return 0;

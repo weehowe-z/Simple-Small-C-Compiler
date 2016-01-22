@@ -17,8 +17,8 @@ lex.yy.c: lex.l
 
 lex.yy.o: lex.yy.c y.tab.h
 	$(CC) -c $(CPPFLAGS) lex.yy.c 2> error.lex.log
-	# cat error.lex.log
+# cat error.lex.log
 
 y.tab.o: y.tab.c
 	$(CC) -c $(CPPFLAGS) y.tab.c 2> error.y.log
-	# cat error.y.log
+# cat error.y.log

@@ -1,12 +1,11 @@
-#ifndef utility
-#define utility
+#ifndef common_h
+#define common_h
 #include "header.h"
 
 #define addCode(x) \
 TreeNode::Codes.push_back(code(x)); \
 Codes.back().comment=getToRoot(); \
-//cerr<<Codes.back().tpl<<endl; \
-//cerr<<Codes.back().comment<<endl;
+
 
 #define addDefs(x) \
 TreeNode::Defs.push_back(code(x)); \
@@ -56,10 +55,13 @@ public:
     void printComment(){
         printf("\n;%s\n\n",comment.c_str());
     }
+    void printline(){
+        printf("\n");
+    }
     code(const string l):tpl(l){};
     code(const string l,const vector<string> re):tpl(l),regs(re){};
     code(const string l, const string c):tpl(l),comment(c){};
 };
 
 
-#endif //utility
+#endif

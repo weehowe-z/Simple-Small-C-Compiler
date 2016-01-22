@@ -67,6 +67,24 @@ void TreeNode::freReg(string id) {
     }
 }
 
+void TreeNode::CodePrint() {
+    init();
+    cerr<<"*********"<<endl;
+    optimize=true;
+    this->Codegen();
+
+    for(int i=0; i<Defs.size();i++){
+        Defs[i].print();
+        Defs[i].printline();
+    }
+
+    for (int i = 0; i < Codes.size(); i++) {
+        Codes[i].print();
+        Codes[i].printline();
+    }
+}
+
+
 int TreeNode::SearchIdType(const string &id, string &type) const {
     const TreeNode *treeNode = this;
 
@@ -129,6 +147,7 @@ int TreeNode::SearchIdPointer(const string &id, string &MemPtr) const {
     return -1;
 }
 
+
 int TreeNode::saveIdtoTable(const string & id,  const string & type, string & MemPtr) {
     cerr<<"first layer:"<<id<<type<<endl;
     string n;
@@ -180,26 +199,5 @@ void printTree(TreeNode *t, int level) {
     i = 0;
     for (; i < t->childrenSize; i++) {
         printTree(t->children[i], level + 1);
-    }
-}
-
-void TreeNode::CodePrint() {
-    init();
-    optimize=false;
-    this->Codegen();
-    clearWrapper();
-
-    cerr<<"***************************************optimize...."<<endl;
-    optimize=true;
-    this->Codegen();
-
-    for(int i=0; i<Defs.size();i++){
-        Defs[i].print();
-        Defs[i].printComment();
-    }
-
-    for (int i = 0; i < Codes.size(); i++) {
-        Codes[i].print();
-        Codes[i].printComment();
     }
 }
