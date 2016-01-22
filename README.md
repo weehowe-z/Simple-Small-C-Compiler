@@ -3,7 +3,7 @@
 
 ## Introduction
 
-A simplified compiler frontend, including a **lexical analyzer** and a **syntax analyzer**, for `Small-C`, which is a C-like language containing a subset of the C programming language. Besides, it also implements a **code generator** to translate the intermediate representation, which is produced by syntax analyzer, into LLVM instructions.
+A simplified compiler frontend, including a **lexical analyzer** and a **syntax analyzer**, for `Small-C`, which is a C-like language containing a subset of the C programming language. Besides, it also implements a **code generator** to translate the intermediate representation, which is produced by syntax analyzer, into `LLVM` instructions.
 
 
 Using **Flex**, **Bison** and **LLVM**
@@ -90,7 +90,7 @@ Parser does not expect }
 ```
 #### 2. Semantic Error Handling
 I have done some of the semantic error detection.
-##### Operand type checking
+##### **Operand type checking**
 As operation like `dot` or `[]`, we will first checking whether the operation is valid for the object. For example,:
 ```
 Input:
@@ -109,13 +109,33 @@ Parsing Complete!
 Error: Semantic error at line 4
 Expected rules: EXPS: ID DOT ID
 only struct can  be used as first parameter of Dot
+Exit
 ```
+##### **Declaration checking**
+It maintain a symbol table the know whether the symbol has been declared. For example:
+```
+Input:
+
+int main()
+{
+	return p;
+}
+
+---
+Output:
+....
+Parsing Complete!
+Error: Semantic error at line 3
+Expected rules: EXPS: ID ARRS
+not found symbol:p
+Exit
+```   
 
 
 
 
 
-#### 2. Clear Tree Structure Printing
+#### 3. Clear Tree Structure Printing
 As mentioned above, I don't use preorder to print the parse tree. Instead, I use complicated functions to print a more distinct and clear tree structures for sake of beauty and more intuitive sense of the parse tree.
 
 
@@ -146,11 +166,11 @@ TYPE  ID ( PARAS ) { DEFS STMTS }
 
 ## Other
 
-**All related information can be also found at my [github](https://github.com/weehowe-z/Simple-Small-C-Compiler).**
+**All related information can be also found on my [github](https://github.com/weehowe-z/Simple-Small-C-Compiler).**
 
 **Any problem happens to my code(can't run.. etc), plz contact me at [weehowe.z@gmail.com](mailto:weehowe.z@gmail.com)**
 
-跑不了的话, 可以联系我远程演示= =
+有问题的话, 可以联系我远程演示= =
 
 
 
