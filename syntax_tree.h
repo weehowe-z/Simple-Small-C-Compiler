@@ -10,7 +10,7 @@ if (rtn!=0) { err(y) }
 if(rtn!=0) { err(y) exit(-1);}
 
 #define err(x) \
-cerr<<"Error: Semantic error at line "<<lineCount<<"\tExpected rules: "<<content<<"\n"<<(x)<<endl<<"Exit\n";
+cerr<<"Error: Semantic error at line "<<lineCount<<"\nExpected rules: "<<content<<"\n"<<(x)<<endl<<"Exit\n";
 
 struct IdInfo{
     int lineno;
