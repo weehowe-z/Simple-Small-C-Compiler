@@ -1,22 +1,23 @@
-LEX=lex
-YACC=yacc
-CC="g++"
-STD="-std=c++11"
+all: scc
 
-scc:lex.yy.o y.tab.o header.h syntax_tree.h syntax_tree.cpp TreeNode.h TreeNode.cpp utility.h
-	$(CC) $(STD) y.tab.c TreeNode.cpp syntax_tree.cpp -g -ly -ll -o scc 
 
-lex.yy.o:lex.yy.c y.tab.h
-	$(CC) -c $(STD) lex.yy.c 2> error_lex_yy.err
-
-y.tab.o:y.tab.c header.h syntax_tree.h syntax_tree.cpp TreeNode.h TreeNode.cpp utility.h
-	$(CC) -c $(STD) y.tab.c 2> error_y_tab.err
-
-y.tab.c y.tab.h:smallc.y header.h syntax_tree.h syntax_tree.cpp TreeNode.h TreeNode.cpp utility.h
-	$(YACC) smallc.y -v -d
-
-lex.yy.c:	lex.l
-	$(LEX) 	lex.l
+CC= g++
+CPPFLAGS= -std=c++11
 
 clean:
-	rm -f *.o *.c *.tab.h *.output *.err *.ll scc NVM_RC_VERSION=
+	$(RM) *.o *.c *.tab.h *.output *.log *.ll scc NVM_RC_VERSION=
+
+scc:lex.yy.o y.tab.o header.h syntax_tree.h syntax_tree.cpp TreeNode.h TreeNode.cpp utility.h
+	$(CC) -o $@  $(CPPFLAGS) y.tab.c TreeNode.cpp syntax_tree.cpp -g -ly -ll
+
+y.tab.c y.tab.h: parser.y
+	yacc parser.y -v -d
+
+lex.yy.c:	lex.l
+	flex 	lex.l
+
+lex.yy.o: lex.yy.c y.tab.h
+	$(CC) -c $(CPPFLAGS) lex.yy.c 2> error.lex.log
+
+y.tab.o: y.tab.c header.h syntax_tree.h syntax_tree.cpp TreeNode.h TreeNode.cpp utility.h
+	$(CC) -c $(CPPFLAGS) y.tab.c 2> error.y.log
