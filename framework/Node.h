@@ -86,7 +86,7 @@ public:
     };
 };
 
-TreeNode* getNodeInstance(int line,string type, string content, int childrenSize, ...);
+TreeNode* createNodeIns(int line,string type, string content, int childrenSize, ...);
 
 #endif
 

@@ -1,6 +1,6 @@
 #include "Node.h"
 
-TreeNode *getNodeInstance(int line, string type, string content, int childrenSize, ...) {
+TreeNode *createNodeIns(int line, string type, string content, int childrenSize, ...) {
     //cerr<<"requesting class "+className<<endl;
     TreeNode *p = ConstValue::get(type);
     p->className = type;
