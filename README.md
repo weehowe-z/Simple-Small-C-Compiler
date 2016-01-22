@@ -133,6 +133,9 @@ Expected rules: EXPS: ID ARRS
 not found symbol:p
 Exit
 ```
+##### **Resevered word  handling**
+This is implemented by the flex and yacc, as there are reserved words ,It will generate error during the building of the tree.
+
 ##### **Break and continue checking**   
 Break and continue can only be used in a for-loop. A stack is used to maintain if program is inside a for loop, and each time there meets the token will first check the stack.  For example:
 ```
@@ -157,8 +160,8 @@ Exit
 
 
 
-#### 3. Optimization
-As there maintain a symbol table, for unused function declaration, the internal Tree Node will be directly removed for dead code elimination.
+#### 3. Code Optimization
+As there maintain a symbol table, for **unused function declaration**, the internal Tree Node will be directly removed for dead code elimination. As the same, **unused struct declaration** are also eliminated by removing the Node.
 
 #### 4. Tree Structure Printing
 As mentioned in project 1, I don't use pre-order to print the parse tree. Instead, I use complicated functions to print a more distinct and clear tree structures for sake of beauty and more intuitive sense of the parse tree.
@@ -211,7 +214,7 @@ Total time spent: 1.11ms
 ---
 
 ## A Little More Details
-
+![compiler-project-img-1](http://7xpne1.com1.z0.glb.clouddn.com/compiler-project-img-1.jpg)
 ###Lexical Analyzer
 A lexical analyser has been implemented in this part. It reads the source codes of **SMALLC** and separates them into tokens. The work is done using *FLEX* and the related file is `"lex.l"`
 ####Read and Write
@@ -288,6 +291,12 @@ The Parse Tree Generation is based on the construction of different kinds of Nod
 		<td>...</td>
 	</tr>
 </table>
+####Register Allocation 
+According some reference book, the algorithm is shown below, a little bit like **FIFO**:
+1. Maintain a set `freeRgSet`for free registers . 
+2. whenever `regFree` is called, then the specific register will be add to  `freeRgSet`
+3. whenever `regAllocate` is called, then return the first element of `freeRgSet`. If there are no valid reg then return a newly created name.
+
 ####Intermediate Representation 
 These are all related to llvm documents. And implements through code-gen functions in all inherits of Node class.
 <table>
