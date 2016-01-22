@@ -160,7 +160,7 @@ Exit
 #### 3. Optimization
 As there maintain a symbol table, for unused function declaration, the internal Tree Node will be directly removed for dead code elimination.
 
-#### 4. Clear Tree Structure Printing
+#### 4. Tree Structure Printing
 As mentioned in project 1, I don't use pre-order to print the parse tree. Instead, I use complicated functions to print a more distinct and clear tree structures for sake of beauty and more intuitive sense of the parse tree.
 
 
@@ -190,7 +190,23 @@ TYPE  ID ( PARAS ) { DEFS STMTS }
  
  You may need `MonoDevelop` under Ubuntu or some other text editors to open the output, otherwise some text editors like `sublime text3` will automatically create a new line for wide output which may affect the beauty. Or 
 you can just input fewer codes to see the output.
+#### 5. Timer
+The compiler will get the total time for the procedure. You can analysis the efficiency with the clock time.
+```
+...
+-------------------
+InputFile -> testcase-input/queen/queen.sc
+Parsing Complete!
+Translation Complete!
+Total time spent: 2.74ms
 
+-------------------
+InputFile -> testcase-input/struct/struct.sc
+Parsing Complete!
+Translation Complete!
+Total time spent: 1.11ms
+...
+```
 
 ---
 
@@ -273,7 +289,7 @@ The Parse Tree Generation is based on the construction of different kinds of Nod
 	</tr>
 </table>
 ####Intermediate Representation 
-These are all related to llvm documents.
+These are all related to llvm documents. And implements through code-gen functions in all inherits of Node class.
 <table>
 	<tr>
 		<td><B>Small C</B></td>
