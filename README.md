@@ -129,14 +129,36 @@ Error: Semantic error at line 3
 Expected rules: EXPS: ID ARRS
 not found symbol:p
 Exit
-```   
+```
+##### **Break and continue checking**   
+Break and continue can only be used in a for-loop. A stack is used to maintain if program is inside a for loop, and each time there meets the token will first check the stack.  For example:
+```
+Input:
+
+int main()
+{
+	break;
+	return 0;
+}
+
+---
+Output:
+....
+Parsing Complete!
+Error: Semantic error at line 3
+Expected rules: STMT: BREAK ;
+break must be in for statement
+Exit
+```
 
 
 
 
+#### 3. Optimization
+As there maintain a symbol table, for unused function declaration, the internal Tree Node will be directly removed for dead code elimination.
 
-#### 3. Clear Tree Structure Printing
-As mentioned above, I don't use preorder to print the parse tree. Instead, I use complicated functions to print a more distinct and clear tree structures for sake of beauty and more intuitive sense of the parse tree.
+#### 4. Clear Tree Structure Printing
+As mentioned in project 1, I don't use pre-order to print the parse tree. Instead, I use complicated functions to print a more distinct and clear tree structures for sake of beauty and more intuitive sense of the parse tree.
 
 
 **ATTENSION!!**  As I print the parse tree in lines for beauty, like this:
@@ -163,6 +185,7 @@ TYPE  ID ( PARAS ) { DEFS STMTS }
  Thus, the output parse is **very wide** when the input code is complex. 
  
  You may need `MonoDevelop` under Ubuntu or some other text editors to open the output, otherwise some text editors like `sublime text3` will automatically create a new line for wide output which may affect the beauty. Or you can just input fewer codes to see the output.
+
 
 ## Other
 
