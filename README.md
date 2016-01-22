@@ -1,5 +1,8 @@
 # Simple Small C Compiler
 
+####Name: Wenhao Zhu
+
+####Student ID: 5130309717
 
 ## Introduction
 
@@ -184,7 +187,47 @@ TYPE  ID ( PARAS ) { DEFS STMTS }
  
  Thus, the output parse is **very wide** when the input code is complex. 
  
- You may need `MonoDevelop` under Ubuntu or some other text editors to open the output, otherwise some text editors like `sublime text3` will automatically create a new line for wide output which may affect the beauty. Or you can just input fewer codes to see the output.
+ You may need `MonoDevelop` under Ubuntu or some other text editors to open the output, otherwise some text editors like `sublime text3` will automatically create a new line for wide output which may affect the beauty. Or 
+you can just input fewer codes to see the output.
+```
+
+---
+
+## Details
+
+###Lexical Analyzer
+A lexical analyser has been implemented in this part. It reads the source codes of **SMALLC** and separates them into tokens. The work is done using *FLEX* and the related file is `"lex.l"`
+####Read and Write
+Since most of the details of **TOKENS** and **Operators** are given to us in the project requirement, I will not talk about them in the report. Instead, I will show you how to deal with **read** and **write** tokens. They are also very simple:
+```
+read 			{ yylval.string = strdup(yytext); return (READ);}
+write 		    { yylval.string = strdup(yytext); return (WRITE);}
+```
+###Syntax Analyzer
+In this step, I performed the syntax analysis using *YACC* and the file name is `"smallc.y"`.
+####Precedence of *IF* and *IF ELSE* Statement
+There exists a conflict in the implementation of "*IF LP EXP RP STMT*" and "*IF LP EXP RP STMT ELSE STMT*", and the former one should have a lower precedence than the latter one. Here is the implementation:
+
+	%nonassoc LOWER_THAN_ELSE
+	%nonassoc ELSE
+	%%
+	STMT:
+	 | IF LP EXP RP STMT %prec LOWER_THAN_ELSE
+	 | IF LP EXP RP STMT ELSE STMT
+	 ;
+
+####Error Message
+The error message is done together with generating the parse tree. Once an error occurs during the procedure, the parse process will shutdown and report the just-found mistake:
+```
+int yyerror(const char *msg)
+{
+	fflush(stdout);
+	fprintf(stderr, "Error: %s at line %d\n", msg,yylineno);
+	fprintf(stderr, "Parser does not expect '%s\n'",yytext);
+}
+```
+
+It will show you the line number of the error and its error text.
 
 
 ## Other
@@ -193,7 +236,7 @@ TYPE  ID ( PARAS ) { DEFS STMTS }
 
 **Any problem happens to my code(can't run.. etc), plz contact me at [weehowe.z@gmail.com](mailto:weehowe.z@gmail.com)**
 
-有问题的话, 可以联系我远程演示= =
+请用 **lli-3.5** 执行IR代码, 有问题的话, 可以联系我远程演示= =
 
 
 
