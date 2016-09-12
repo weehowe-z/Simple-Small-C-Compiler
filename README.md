@@ -1,8 +1,11 @@
 # Simple Small C Compiler
 
-####Name: Wenhao Zhu
+#### CS308 Compiler Principles (A) Course Project
 
-####Student ID: 5130309717
+#### Name: Wenhao Zhu
+
+#### Student ID: 5130309717
+
 
 ## Introduction
 
@@ -48,11 +51,11 @@ Then you're free to use llvm runtime to excute IR codes. For example:
 ```
 $ lli arth.ll
 ```
-**ATTENSION!!**  As llvm IR syntax rules changes with version.  My code generation is based on **llvm 3.5!!**. I've test that **llvm-3.7** or higher does not support the current IR code. Thus,  you may need to run:
+**ATTENSION!**  As llvm IR syntax rules changes with version.  My code generation is based on **llvm 3.5**. I've test that **llvm-3.7** or higher does not support the current IR code. Thus,  you may need to run:
 ```
 $ lli-3.5 arth.ll
 ```
- 
+
 ### 2.Run test manually
 
 ```
@@ -95,6 +98,7 @@ Parser does not expect }
 I have done some of the semantic error detection.
 ##### **Operand type checking**
 As operation like `dot` or `[]`, we will first checking whether the operation is valid for the object. For example,:
+
 ```
 Input:
 
@@ -114,8 +118,10 @@ Expected rules: EXPS: ID DOT ID
 only struct can  be used as first parameter of Dot
 Exit
 ```
+
 ##### **Declaration checking**
 It maintain a symbol table the know whether the symbol has been declared. For example:
+
 ```
 Input:
 
@@ -138,6 +144,7 @@ This is implemented by the flex and yacc, as there are reserved words ,It will g
 
 ##### **Break and continue checking**   
 Break and continue can only be used in a for-loop. A stack is used to maintain if program is inside a for loop, and each time there meets the token will first check the stack.  For example:
+
 ```
 Input:
 
@@ -157,9 +164,6 @@ break must be in for statement
 Exit
 ```
 
-
-
-
 #### 3. Code Optimization
 As there maintain a symbol table, for **unused function declaration**, the internal Tree Node will be directly removed for dead code elimination. As the same, **unused struct declaration** are also eliminated by removing the Node.
 
@@ -176,25 +180,26 @@ As mentioned in project 1, I don't use pre-order to print the parse tree. Instea
                   EXTDEFS                  
                      |
                  |-------------------|
-              EXTDEF              EXTDEFS 
+              EXTDEF              EXTDEFS
                  |                   |
   |---------|-------------|          
-SPEC      FUNC        STMTBLOCK      ϵ 
+SPEC      FUNC        STMTBLOCK      ϵ
   |         |             |
   |    |-|---|---| |---|----|---|
-TYPE  ID ( PARAS ) { DEFS STMTS } 
+TYPE  ID ( PARAS ) { DEFS STMTS }
   |    |     |         |    |
   |    |     |         |    |
- int main    ϵ         ϵ    ϵ 
- 
+ int main    ϵ         ϵ    ϵ
+
 ```
- 
- Thus, the output parse is **very wide** when the input code is complex. 
- 
- You may need `MonoDevelop` under Ubuntu or some other text editors to open the output, otherwise some text editors like `sublime text3` will automatically create a new line for wide output which may affect the beauty. Or 
+
+ Thus, the output parse is **very wide** when the input code is complex.
+
+ You may need `MonoDevelop` under Ubuntu or some other text editors to open the output, otherwise some text editors like `sublime text3` will automatically create a new line for wide output which may affect the beauty. Or
 you can just input fewer codes to see the output.
 #### 5. Timer
 The compiler will get the total time for the procedure. You can analysis the efficiency with the clock time.
+
 ```
 ...
 -------------------
@@ -214,18 +219,28 @@ Total time spent: 1.11ms
 ---
 
 ## A Little More Details
+
 ![compiler-project-img-1](http://7xpne1.com1.z0.glb.clouddn.com/compiler-project-img-1.jpg)
-###Lexical Analyzer
+
+### Lexical Analyzer
+
 A lexical analyser has been implemented in this part. It reads the source codes of **SMALLC** and separates them into tokens. The work is done using *FLEX* and the related file is `"lex.l"`
-####Read and Write
+
+#### Read and Write
+
 Since most of the details of **TOKENS** and **Operators** are given to us in the project requirement, I will not talk about them in the report. Instead, I will show you how to deal with **read** and **write** tokens. They are also very simple:
+
 ```
 read 			{ yylval.string = strdup(yytext); return (READ);}
 write 		    { yylval.string = strdup(yytext); return (WRITE);}
 ```
-###Syntax Analyzer
+
+### Syntax Analyzer
+
 In this step, I performed the syntax analysis using *YACC* and the file name is `"parser.y"`.
-####Precedence of *IF* and *IF ELSE* Statement
+
+#### Precedence of *IF* and *IF ELSE* Statement
+
 There exists a conflict in the implementation of "*IF LP EXP RP STMT*" and "*IF LP EXP RP STMT ELSE STMT*", and the former one should have a lower precedence than the latter one. Here is the implementation:
 
 	%nonassoc LOWER_THAN_ELSE
@@ -236,8 +251,9 @@ There exists a conflict in the implementation of "*IF LP EXP RP STMT*" and "*IF 
 	 | IF LP EXP RP STMT ELSE STMT
 	 ;
 
-####Error Message
+#### Error Message
 The error message is done together with generating the parse tree. Once an error occurs during the procedure, the parse process will shutdown and report the just-found mistake:
+
 ```
 int yyerror(const char *msg)
 {
@@ -249,9 +265,12 @@ int yyerror(const char *msg)
 
 It will show you the line number of the error and its error text.
 
-###Semantic Analyzer & IR Generation
+### Semantic Analyzer & IR Generation
+
 In this section, I have implemented the Semantic Analyzer & IR Generation together with the formation of the parse tree.
-####Tree Generation
+
+#### Tree Generation
+
 The Parse Tree Generation is based on the construction of different kinds of Node and implements its `codegen` function. For example, some of the different variables of *Node* and there usage are shown in the table below:
 
 <table>
@@ -291,13 +310,16 @@ The Parse Tree Generation is based on the construction of different kinds of Nod
 		<td>...</td>
 	</tr>
 </table>
-####Register Allocation 
+
+#### Register Allocation
+
 According some reference book, the algorithm is shown below, a little bit like **FIFO**:
-1. Maintain a set `freeRgSet`for free registers . 
+1. Maintain a set `freeRgSet`for free registers .
 2. whenever `regFree` is called, then the specific register will be add to  `freeRgSet`
 3. whenever `regAllocate` is called, then return the first element of `freeRgSet`. If there are no valid reg then return a newly created name.
 
-####Intermediate Representation 
+#### Intermediate Representation
+
 These are all related to llvm documents. And implements through code-gen functions in all inherits of Node class.
 <table>
 	<tr>
@@ -307,16 +329,16 @@ These are all related to llvm documents. And implements through code-gen functio
 	<tr>
 	<tr>
 		<td>read</td>
-		<td>%s = call i32 (i8*, ...)* @__isoc99_scanf(i8* 
-getelementptr inbounds ([3 x i8]* @.str, i32 0, i32 
+		<td>%s = call i32 (i8*, ...)* @__isoc99_scanf(i8*
+getelementptr inbounds ([3 x i8]* @.str, i32 0, i32
 0), i32* %s) </td>
 	</tr>
 	<tr>
 		<td>write</td>
-		<td>%s = call i32 (i8*, ...)* @__isoc99_scanf(i8* 
-getelementptr inbounds ([3 x i8]* @.str, i32 0, i32 
+		<td>%s = call i32 (i8*, ...)* @__isoc99_scanf(i8*
+getelementptr inbounds ([3 x i8]* @.str, i32 0, i32
 0), i32* %s) </td>
-	</tr>	
+	</tr>
 	<tr>
 		<td>continue, break</td>
 		<td>br label %%%s </td>
@@ -337,9 +359,3 @@ getelementptr inbounds ([3 x i8]* @.str, i32 0, i32
 **Any problem happens to my code(can't run.. etc), plz contact me at [weehowe.z@gmail.com](mailto:weehowe.z@gmail.com)**
 
 请用 **lli-3.5** 执行IR代码, 有问题的话, 可以联系我远程演示= =
-
-
-
-
- 
-
