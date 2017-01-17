@@ -359,3 +359,34 @@ getelementptr inbounds ([3 x i8]* @.str, i32 0, i32
 **Any problem happens to my code(can't run.. etc), plz contact me at [weehowe.z@gmail.com](mailto:weehowe.z@gmail.com)**
 
 请用 **lli-3.5** 执行IR代码, 有问题的话, 可以联系我远程演示= =
+
+---
+
+## Issues
+
+As there are some people sending me email for help. I just copy the reply here.
+
+**1.Fail to execute the compiled IR code (under `testcase-output-IR` folder)**
+
+I presume that your LLVM version is greater than or equal to 3.6?
+
+As I have written in README, the code generator is based on the syntax rules of LLVM 3.5, however, since LLVM 3.6, it doses not compatible with any previous version. 
+
+Under Arch Linux distribution, LLVM has two versions, the latest(3.9) and 3.5.  I guess other Linux / OSX distributions have the same situation.
+
+Under Ubuntu, you may try to install llvm-3.5 and run the IR code by `lli-3.5  xxxcode.ll`.
+
+**2.Fail to compile the compiler**
+
+You can just check the Makefile to see the related instructions.
+
+```
+scc: lex.yy.o y.tab.o header.h syntax_tree.h syntax_tree.cpp Node.h Node.cpp common.h
+    $(CC) -o $@ $(CPPFLAGS) y.tab.c Node.cpp syntax_tree.cpp -g -ly -ll
+```
+
+If the failure occurred during compiling ssc, this is probably caused by missing dependent libs.
+
+Try  `$(CC) -o $@ $(CPPFLAGS) y.tab.c Node.cpp syntax_tree.cpp -g`, it may also work.
+
+
